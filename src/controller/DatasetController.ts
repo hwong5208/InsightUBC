@@ -4,7 +4,7 @@
 
 import Log from "../Util";
 import JSZip = require('jszip');
-
+import fs = require('fs');
 /**
  * In memory representation of all datasets.
  */
@@ -12,6 +12,18 @@ export interface Datasets {
     [id: string]: {};
 }
 
+/*
+ export interface Course_details {
+ course_dept:string; // "Subject"
+ course_id: String; // "Course"
+ course_avg: number; //"Avg"Professor""
+ course_instructor: string; //"Professor"
+ course_title:string;  //"Title"
+ course_pass:number; //"Pass"
+ course_fail:number; //"Fail"
+ course_audit:number; // "Audit"
+ }
+ */
 export default class DatasetController {
 
     private datasets: Datasets = {};
@@ -27,15 +39,44 @@ export default class DatasetController {
      * @param id
      * @returns {{}}
      */
+    /*
+     public getDataset(id: string): any {
+
+     return this.datasets[id];
+     }
+     */
     public getDataset(id: string): any {
         // TODO: this should check if the dataset is on disk in ./data if it is not already in memory.
 
-        return this.datasets[id];
+        if (this.datasets.hasOwnProperty(id)){
+            return this.datasets[id];
+        }
+
+
+        fs.readFile("./data/"+id, function read(err, data) {
+            if (err) {
+                return null;
+            }
+            //JSON.parse(data);
+            return data;
+        });
+
     }
+
 
     public getDatasets(): Datasets {
         // TODO: if datasets is empty, load all dataset files in ./data from disk
-   //HI//
+        if (Object.keys(this.datasets).length === 0){
+            let filename = fs.readdirSync('./data');
+            for ( let fn of filename){
+                let data = fs.readFileSync('./data/'+fn,'utf-8');
+                console.log(data);
+                let id = fn.substring(0,fn.lastIndexOf('.'));
+                this.datasets[id]=JSON.parse(data);
+            }
+
+        }
+
         return this.datasets;
     }
 
@@ -57,12 +98,46 @@ export default class DatasetController {
                     Log.trace('DatasetController::process(..) - unzipped');
 
                     let processedDataset = {};
+                    //let processedDataset:any = [];
+//                    processedDataset["course_dept"];
+
                     // TODO: iterate through files in zip (zip.files)
                     // The contents of the file will depend on the id provided. e.g.,
                     // some zips will contain .html files, some will contain .json files.
                     // You can depend on 'id' to differentiate how the zip should be handled,
                     // although you should still be tolerant to errors.
 
+                    //by Zack
+                    var promises = []
+
+                    for(let f in zip.files){
+                        try {
+                            zip.file(f).async("string").then(function (data) {
+                                // console.log(data);
+                                let a = JSON.parse(data);
+
+                                for(let i in a.result ) {
+                                    console.log("course_dept : "+a.result[i].Subject);
+                                    console.log("course_id : "+a.result[i].Course);
+                                    console.log("course_avg : "+a.result[i].Avg);
+                                    console.log("course_instructor : "+a.result[i].Professor);
+                                    console.log("course_title : "+a.result[i].Title);
+                                    console.log("course_pass : "+a.result[i].Pass);
+                                    console.log("course_fail : "+a.result[i].Fail);
+                                    console.log("course_audit : "+a.result[i].Audit);
+
+
+
+                                }
+
+                            });
+                        }catch(err){      }
+                    }
+
+
+
+
+                    // by zack
                     that.save(id, processedDataset);
 
                     fulfill(true);
@@ -89,5 +164,16 @@ export default class DatasetController {
         this.datasets[id] = processedDataset;
 
         // TODO: actually write to disk in the ./data directory
+
+        // create the './data' folder if it does't exist
+        //by Zack
+
+        let dir = './data';
+        if(!fs.existsSync(dir)){
+            fs.mkdirSync(dir);
+        }
+        fs.writeFileSync('./data/'+id, this.datasets[id]);
+
+
     }
 }
