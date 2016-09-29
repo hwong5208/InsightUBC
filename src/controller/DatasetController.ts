@@ -155,52 +155,52 @@ export default class DatasetController {
                     }
 
 
-
+                  try{
                     for(let f in zip.files){
                            // read file
-                        promises.push( zip.file(f).async("string").then(function (data) {
-                            let promise =  new Promise(function(resolve, reject) {
-                                let a = JSON.parse(data);
-
-                                for(let i in a.result ) {
-
-                                    /*
-                                    console.log("course_dept : "+a.result[i].Subject);
-                                    console.log("course_id : "+a.result[i].Course);
-                                    console.log("course_avg : "+a.result[i].Avg);
-                                    console.log("course_instructor : "+a.result[i].Professor);
-                                    console.log("course_title : "+a.result[i].Title);
-                                    console.log("course_pass : "+a.result[i].Pass);
-                                    console.log("course_fail : "+a.result[i].Fail);
-                                    console.log("course_audit : "+a.result[i].Audit);
-                                    */
-
-                                    let b = new ClassInformation();
-                                    b.setCourse_dept(a.result[i].Subject);
-                                    b.setCourse_id(a.result[i].Course);
-                                    b.setCourse_avg(a.result[i].Avg);
-                                    b.setCourse_instructor(a.result[i].Professor);
-                                    b.setCourse_title(a.result[i].Title);
-                                    b.setCourse_pass(a.result[i].Pass);
-                                    b.setCourse_fail(a.result[i].Fail);
-                                    b.setCourse_audit(a.result[i].Audit);
-
-                                    processedDataset.push(JSON.stringify(b));
-                                }
+                        promises.push( zip.file(f).async("string").then(function (data ) {
 
 
-                            });
+                                   let a = JSON.parse(data);
+                                   for (let i in a.result) {
+
+                                       /*
+                                        console.log("course_dept : "+a.result[i].Subject);
+                                        console.log("course_id : "+a.result[i].Course);
+                                        console.log("course_avg : "+a.result[i].Avg);
+                                        console.log("course_instructor : "+a.result[i].Professor);
+                                        console.log("course_title : "+a.result[i].Title);
+                                        console.log("course_pass : "+a.result[i].Pass);
+                                        console.log("course_fail : "+a.result[i].Fail);
+                                        console.log("course_audit : "+a.result[i].Audit);
+                                        */
+
+                                       let b = new ClassInformation();
+                                       b.setCourse_dept(a.result[i].Subject);
+                                       b.setCourse_id(a.result[i].Course);
+                                       b.setCourse_avg(a.result[i].Avg);
+                                       b.setCourse_instructor(a.result[i].Professor);
+                                       b.setCourse_title(a.result[i].Title);
+                                       b.setCourse_pass(a.result[i].Pass);
+                                       b.setCourse_fail(a.result[i].Fail);
+                                       b.setCourse_audit(a.result[i].Audit);
+
+                                       processedDataset.push(JSON.stringify(b));
+                                   }
+
+
+                            ;
 
                         }));
 
 
                     }
+                    }catch(err){};
                     Promise.all(promises).then( function () {
                         that.save(id, processedDataset)
                     } ).catch(function (err) {
 
-                    });
-
+                    })
 
                     // by zack
 
@@ -241,9 +241,7 @@ export default class DatasetController {
 
         }
 
-       // console.log( fs.mkdir("./"+id));
 
-       // fs.writeFileSync('./data/'+id, this.datasets[id]);
         fs.writeFile('./data/'+id,processedDataset);
 
 
