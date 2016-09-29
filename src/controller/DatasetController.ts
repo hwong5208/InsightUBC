@@ -12,19 +12,48 @@ export interface Datasets {
     [id: string]: {};
 }
 
+class ClassInformation {
 
-/*
- export interface Course_details {
- course_dept:string; // "Subject"
- course_id: String; // "Course"
- course_avg: number; //"Avg"Professor""
- course_instructor: string; //"Professor"
- course_title:string;  //"Title"
- course_pass:number; //"Pass"
- course_fail:number; //"Fail"
- course_audit:number; // "Audit"
- }
- */
+    courses_dept:string;
+    courses_id:string;
+    courses_avg:number;
+    courses_instructor:string;
+    courses_title:string;
+    courses_pass:number;
+    courses_fail:number;
+    courses_audit:number
+
+    constructor(){
+        this.courses_dept = null;
+        this.courses_id = null;
+        this.courses_avg = null;
+        this.courses_instructor = null;
+        this.courses_title = null;
+        this.courses_pass = null;
+        this.courses_fail = null;
+        this.courses_audit = null;
+    }
+
+    setCourse_dept(dept:string){this.courses_dept =dept};
+    setCourse_id(i:string){this.courses_id =i};
+    setCourse_avg(a:number){this.courses_avg= a};
+    setCourse_instructor(nm:string){this.courses_instructor= nm};
+    setCourse_title(t:string){this.courses_title = t};
+    setCourse_pass(p:number){this.courses_pass=p};
+    setCourse_fail(f:number){this.courses_fail=f};
+    setCourse_audit(a:number){this.courses_audit=a};
+
+    getCourse_dept(){return this.courses_dept};
+    getCourse_id(){return this.courses_id};
+    getCourse_avg(){return this.courses_avg};
+    getCourse_instructor(){return this.courses_instructor};
+    getCourse_title(){return this.courses_title };
+    getCourse_pass(){ return this.courses_pass};
+    getCourse_fail(){ return this.courses_fail};
+    getCourse_audit(){ return this.courses_audit};
+
+}
+
 export default class DatasetController {
 
     private datasets: Datasets = {};
@@ -111,87 +140,33 @@ export default class DatasetController {
                     //by Zack
                     let promises:any = [];
 
-
-                    class ClassInformation {
-
-                        courses_dept:string;
-                        courses_id:string;
-                        courses_avg:number;
-                        courses_instructor:string;
-                        courses_title:string;
-                        courses_pass:number;
-                        courses_fail:number;
-                        courses_audit:number
-
-                        constructor(){
-                         this.courses_dept = null;
-                         this.courses_id = null;
-                         this.courses_avg = null;
-                         this.courses_instructor = null;
-                         this.courses_title = null;
-                         this.courses_pass = null;
-                         this.courses_fail = null;
-                         this.courses_audit = null;
-                        }
-
-                        setCourse_dept(dept:string){this.courses_dept =dept};
-                        setCourse_id(i:string){this.courses_id =i};
-                        setCourse_avg(a:number){this.courses_avg= a};
-                        setCourse_instructor(nm:string){this.courses_instructor= nm};
-                        setCourse_title(t:string){this.courses_title = t};
-                        setCourse_pass(p:number){this.courses_pass=p};
-                        setCourse_fail(f:number){this.courses_fail=f};
-                        setCourse_audit(a:number){this.courses_audit=a};
-
-                        getCourse_dept(){return this.courses_dept};
-                        getCourse_id(){return this.courses_id};
-                        getCourse_avg(){return this.courses_avg};
-                        getCourse_instructor(){return this.courses_instructor};
-                        getCourse_title(){return this.courses_title };
-                        getCourse_pass(){ return this.courses_pass};
-                        getCourse_fail(){ return this.courses_fail};
-                        getCourse_audit(){ return this.courses_audit};
-
-                    }
-
-
                   try{
                     for(let f in zip.files){
                            // read file
-                        promises.push( zip.file(f).async("string").then(function (data ) {
+                        if (zip.file(f)!=null){
+                            promises.push( zip.file(f).async("string").then(function (data ) {
 
 
-                                   let a = JSON.parse(data);
-                                   for (let i in a.result) {
-
-                                       /*
-                                        console.log("course_dept : "+a.result[i].Subject);
-                                        console.log("course_id : "+a.result[i].Course);
-                                        console.log("course_avg : "+a.result[i].Avg);
-                                        console.log("course_instructor : "+a.result[i].Professor);
-                                        console.log("course_title : "+a.result[i].Title);
-                                        console.log("course_pass : "+a.result[i].Pass);
-                                        console.log("course_fail : "+a.result[i].Fail);
-                                        console.log("course_audit : "+a.result[i].Audit);
-                                        */
-
-                                       let b = new ClassInformation();
-                                       b.setCourse_dept(a.result[i].Subject);
-                                       b.setCourse_id(a.result[i].Course);
-                                       b.setCourse_avg(a.result[i].Avg);
-                                       b.setCourse_instructor(a.result[i].Professor);
-                                       b.setCourse_title(a.result[i].Title);
-                                       b.setCourse_pass(a.result[i].Pass);
-                                       b.setCourse_fail(a.result[i].Fail);
-                                       b.setCourse_audit(a.result[i].Audit);
-
-                                       processedDataset.push(JSON.stringify(b));
-                                   }
+                                let a = JSON.parse(data);
+                                for (let i in a.result) {
 
 
-                            ;
+                                    let b = new ClassInformation();
+                                    b.setCourse_dept(a.result[i].Subject);
+                                    b.setCourse_id(a.result[i].Course);
+                                    b.setCourse_avg(a.result[i].Avg);
+                                    b.setCourse_instructor(a.result[i].Professor);
+                                    b.setCourse_title(a.result[i].Title);
+                                    b.setCourse_pass(a.result[i].Pass);
+                                    b.setCourse_fail(a.result[i].Fail);
+                                    b.setCourse_audit(a.result[i].Audit);
 
-                        }));
+                                    processedDataset.push(b);
+                                }
+
+                            }));
+                        }
+
 
 
                     }
@@ -227,7 +202,7 @@ export default class DatasetController {
     private save(id: string, processedDataset: any) {
         // add it to the memory model
         this.datasets[id] = processedDataset;
-        console.log("Saving processedDataset")
+        console.log("Saving processedDataset");
         // TODO: actually write to disk in the ./data directory
 
         // create the './data' folder if it does't exist
@@ -242,7 +217,7 @@ export default class DatasetController {
         }
 
 
-        fs.writeFile('./data/'+id,processedDataset);
+        fs.writeFile('./data/'+id,JSON.stringify(processedDataset) );
 
 
 
