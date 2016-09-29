@@ -184,7 +184,8 @@ export default class DatasetController {
                                     b.setCourse_pass(a.result[i].Pass);
                                     b.setCourse_fail(a.result[i].Fail);
                                     b.setCourse_audit(a.result[i].Audit);
-                                    console.log(b);
+                                   // console.log(b);
+                                    processedDataset.push(b);
                                 }
 
 
@@ -196,7 +197,9 @@ export default class DatasetController {
                     }
                     Promise.all(promises).then( function () {
                         that.save(id, processedDataset)
-                    } );
+                    } ).catch(function (err) {
+
+                    });
 
 
                     // by zack
@@ -233,6 +236,7 @@ export default class DatasetController {
         let dir = './data';
         if(!fs.existsSync(dir)){
             fs.mkdirSync(dir);
+            
         }
         fs.writeFileSync('./data/'+id, this.datasets[id]);
 
