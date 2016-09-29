@@ -52,6 +52,18 @@ class ClassInformation {
     getCourse_fail(){ return this.courses_fail};
     getCourse_audit(){ return this.courses_audit};
 
+    getbykey(s :string):string|number{
+        switch(s){
+            case "courses_dept": return this.courses_dept;
+            case "courses_id": return this.courses_id;
+            case "courses_avg": return this.courses_avg;
+            case "courses_instructor": return this.courses_instructor;
+            case "courses_title": return this.courses_title;
+            case "courses_pass":  return this.courses_pass;
+            case "courses_fail":  return this.courses_fail;
+            case "courses_audit": return this.courses_audit;
+        }
+    }
 }
 
 export default class DatasetController {
