@@ -12,7 +12,7 @@ export interface Datasets {
     [id: string]: {};
 }
 
-class ClassInformation {
+export class ClassInformation {
 
     courses_dept:string;
     courses_id:string;
@@ -21,7 +21,7 @@ class ClassInformation {
     courses_title:string;
     courses_pass:number;
     courses_fail:number;
-    courses_audit:number
+    courses_audit:number;
 
     constructor(){
         this.courses_dept = null;
