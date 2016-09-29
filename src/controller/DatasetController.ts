@@ -12,6 +12,7 @@ export interface Datasets {
     [id: string]: {};
 }
 
+
 /*
  export interface Course_details {
  course_dept:string; // "Subject"
@@ -97,9 +98,9 @@ export default class DatasetController {
                 myZip.loadAsync(data, {base64: true}).then(function (zip: JSZip) {
                     Log.trace('DatasetController::process(..) - unzipped');
 
-                    let processedDataset = {};
-                    //let processedDataset:any = [];
-//                    processedDataset["course_dept"];
+       //             let processedDataset = {};
+                    let processedDataset:any = [];
+
 
                     // TODO: iterate through files in zip (zip.files)
                     // The contents of the file will depend on the id provided. e.g.,
@@ -108,15 +109,62 @@ export default class DatasetController {
                     // although you should still be tolerant to errors.
 
                     //by Zack
-                    var promises = []
+                    let promises:any = [];
+
+
+                    class ClassInformation {
+
+                        course_dept:string;
+                        course_id:string;
+                        course_avg:number;
+                        course_instructor:string;
+                        course_title:string;
+                        course_pass:number;
+                        course_fail:number;
+                        course_audit:number
+
+                        constructor(){
+                         this.course_dept = null;
+                         this.course_id = null;
+                         this.course_avg = null;
+                         this.course_instructor = null;
+                         this.course_title = null;
+                         this.course_pass = null;
+                         this.course_fail = null;
+                         this.course_audit = null;
+                        }
+
+                        setCourse_dept(dept:string){this.course_dept =dept};
+                        setCourse_id(i:string){this.course_id =i};
+                        setCourse_avg(a:number){this.course_avg= a};
+                        setCourse_instructor(nm:string){this.course_instructor= nm};
+                        setCourse_title(t:string){this.course_title = t};
+                        setCourse_pass(p:number){this.course_pass=p};
+                        setCourse_fail(f:number){this.course_fail=f};
+                        setCourse_audit(a:number){this.course_audit=a};
+
+                        getCourse_dept(){return this.course_dept};
+                        getCourse_id(){return this.course_id};
+                        getCourse_avg(){return this.course_avg};
+                        getCourse_instructor(){return this.course_instructor};
+                        getCourse_title(){return this.course_title };
+                        getCourse_pass(){ return this.course_pass};
+                        getCourse_fail(){ return this.course_fail};
+                        getCourse_audit(){ return this.course_audit};
+
+                    }
+
+
 
                     for(let f in zip.files){
-                        try {
-                            zip.file(f).async("string").then(function (data) {
-                                // console.log(data);
+                           // read file
+                        promises.push( zip.file(f).async("string").then(function (data) {
+                            let promise =  new Promise(function(resolve, reject) {
                                 let a = JSON.parse(data);
 
                                 for(let i in a.result ) {
+
+                                    /*
                                     console.log("course_dept : "+a.result[i].Subject);
                                     console.log("course_id : "+a.result[i].Course);
                                     console.log("course_avg : "+a.result[i].Avg);
@@ -125,20 +173,34 @@ export default class DatasetController {
                                     console.log("course_pass : "+a.result[i].Pass);
                                     console.log("course_fail : "+a.result[i].Fail);
                                     console.log("course_audit : "+a.result[i].Audit);
+                                    */
 
-
-
+                                    let b = new ClassInformation();
+                                    b.setCourse_dept(a.result[i].Subject);
+                                    b.setCourse_id(a.result[i].Course);
+                                    b.setCourse_avg(a.result[i].Avg);
+                                    b.setCourse_instructor(a.result[i].Professor);
+                                    b.setCourse_title(a.result[i].Title);
+                                    b.setCourse_pass(a.result[i].Pass);
+                                    b.setCourse_fail(a.result[i].Fail);
+                                    b.setCourse_audit(a.result[i].Audit);
+                                    console.log(b);
                                 }
 
+
                             });
-                        }catch(err){      }
+
+                        }));
+
+
                     }
-
-
+                    Promise.all(promises).then( function () {
+                        that.save(id, processedDataset)
+                    } );
 
 
                     // by zack
-                    that.save(id, processedDataset);
+
 
                     fulfill(true);
                 }).catch(function (err) {
