@@ -114,43 +114,43 @@ export default class DatasetController {
 
                     class ClassInformation {
 
-                        course_dept:string;
-                        course_id:string;
-                        course_avg:number;
-                        course_instructor:string;
-                        course_title:string;
-                        course_pass:number;
-                        course_fail:number;
-                        course_audit:number
+                        courses_dept:string;
+                        courses_id:string;
+                        courses_avg:number;
+                        courses_instructor:string;
+                        courses_title:string;
+                        courses_pass:number;
+                        courses_fail:number;
+                        courses_audit:number
 
                         constructor(){
-                         this.course_dept = null;
-                         this.course_id = null;
-                         this.course_avg = null;
-                         this.course_instructor = null;
-                         this.course_title = null;
-                         this.course_pass = null;
-                         this.course_fail = null;
-                         this.course_audit = null;
+                         this.courses_dept = null;
+                         this.courses_id = null;
+                         this.courses_avg = null;
+                         this.courses_instructor = null;
+                         this.courses_title = null;
+                         this.courses_pass = null;
+                         this.courses_fail = null;
+                         this.courses_audit = null;
                         }
 
-                        setCourse_dept(dept:string){this.course_dept =dept};
-                        setCourse_id(i:string){this.course_id =i};
-                        setCourse_avg(a:number){this.course_avg= a};
-                        setCourse_instructor(nm:string){this.course_instructor= nm};
-                        setCourse_title(t:string){this.course_title = t};
-                        setCourse_pass(p:number){this.course_pass=p};
-                        setCourse_fail(f:number){this.course_fail=f};
-                        setCourse_audit(a:number){this.course_audit=a};
+                        setCourse_dept(dept:string){this.courses_dept =dept};
+                        setCourse_id(i:string){this.courses_id =i};
+                        setCourse_avg(a:number){this.courses_avg= a};
+                        setCourse_instructor(nm:string){this.courses_instructor= nm};
+                        setCourse_title(t:string){this.courses_title = t};
+                        setCourse_pass(p:number){this.courses_pass=p};
+                        setCourse_fail(f:number){this.courses_fail=f};
+                        setCourse_audit(a:number){this.courses_audit=a};
 
-                        getCourse_dept(){return this.course_dept};
-                        getCourse_id(){return this.course_id};
-                        getCourse_avg(){return this.course_avg};
-                        getCourse_instructor(){return this.course_instructor};
-                        getCourse_title(){return this.course_title };
-                        getCourse_pass(){ return this.course_pass};
-                        getCourse_fail(){ return this.course_fail};
-                        getCourse_audit(){ return this.course_audit};
+                        getCourse_dept(){return this.courses_dept};
+                        getCourse_id(){return this.courses_id};
+                        getCourse_avg(){return this.courses_avg};
+                        getCourse_instructor(){return this.courses_instructor};
+                        getCourse_title(){return this.courses_title };
+                        getCourse_pass(){ return this.courses_pass};
+                        getCourse_fail(){ return this.courses_fail};
+                        getCourse_audit(){ return this.courses_audit};
 
                     }
 
@@ -184,8 +184,8 @@ export default class DatasetController {
                                     b.setCourse_pass(a.result[i].Pass);
                                     b.setCourse_fail(a.result[i].Fail);
                                     b.setCourse_audit(a.result[i].Audit);
-                                   // console.log(b);
-                                    processedDataset.push(b);
+
+                                    processedDataset.push(JSON.stringify(b));
                                 }
 
 
@@ -227,18 +227,26 @@ export default class DatasetController {
     private save(id: string, processedDataset: any) {
         // add it to the memory model
         this.datasets[id] = processedDataset;
-
+        console.log("Saving processedDataset")
         // TODO: actually write to disk in the ./data directory
 
         // create the './data' folder if it does't exist
         //by Zack
 
-        let dir = './data';
+//        console.log( fs.lstat('/'+id));
+        let dir = './data/';
+
         if(!fs.existsSync(dir)){
             fs.mkdirSync(dir);
-            
+
         }
-        fs.writeFileSync('./data/'+id, this.datasets[id]);
+
+       // console.log( fs.mkdir("./"+id));
+
+       // fs.writeFileSync('./data/'+id, this.datasets[id]);
+        fs.writeFile('./data/'+id,processedDataset);
+
+
 
 
     }
