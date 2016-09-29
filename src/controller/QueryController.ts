@@ -30,6 +30,18 @@ export interface Filter {
     NOT?:Filter;
 }
 
+export interface Responsedata {
+    courses_dept?:string;
+    courses_id?:string;
+    courses_avg?:number;
+    courses_instructor?:string;
+    courses_title?:string;
+    courses_pass?:number;
+    courses_fail?:number;
+    courses_audit?:number;
+    [key: string]:string|number;
+}
+
 export interface QueryResponse {
 }
 
@@ -53,18 +65,45 @@ export default class QueryController {
         // TODO: implement this
         // By Christine
 
-        let get_query = query.GET;     // array
+        let id = query.GET[0].split("_")[0];
+        let dataset = this.datasets[id];
+        let result = new Array<ClassInformation>();
 
-        let where_query = query.WHERE; // array
+        for (let data of dataset){
+            if(this.helper(data, query.WHERE) == true){
+                result.push(data);
+            }
+        }
+        let b = new Array<Responsedata>();
+        for (let data of result){
+            let r :Responsedata={};
+
+            for (let a of query.GET){
+               r[a] = data.getbykey(a);
+            }
+            b.push(r);                      // b = a shorter list
+        }
+        if(query.ORDER != undefined){
+            b.sort(sortbyorder(query.ORDER));
+
+            function sortbyorder(queryorder:string) {
+                var sortOrder = 1;
+
+                return function (a,b) {
+                    if(a[queryorder] < b[queryorder])
+                        return -1;
+                    if(a[queryorder] == b[queryorder])
+                        return 0;
+                    return 1;
+                }
+            }
+        }
 
 
-        query.WHERE
-
-        let post_query = query.ORDER; //
-
+        return {render: query.AS, result: b};
         // By Christine
 
-        return {status: 'received', ts: new Date().getTime()};
+        //return {status: 'received', ts: new Date().getTime()};
     }
 
     public helper(classes:ClassInformation, filter:Filter):boolean{
@@ -109,11 +148,19 @@ export default class QueryController {
         if (filter.IS != undefined){
             let key = Object.keys(filter.IS)[0];
             let value = filter.IS[key];
-            if (classes.getbykey(key) == value ){
+            if (classes.getbykey(key) == value ){   //cp* reg
                 return true;
             } return false;
 
         }
+        if (filter.NOT != undefined){
+            let result = this.helper(classes,filter.NOT);
+            for (let i = 1; i < filter.AND.length; i++){
+                result = result && this.helper(classes,filter.AND[i]);
+            }
+            return !result;
+        }
+
         return true;
     }
 }
