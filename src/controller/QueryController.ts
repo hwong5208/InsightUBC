@@ -66,6 +66,7 @@ export default class QueryController {
 
         let id = query.GET[0].split("_")[0];
         let dataset = <Array<ClassInformation>>this.datasets[id];
+
         let result = new Array<ClassInformation>();
 
         for (let data of dataset){
@@ -143,16 +144,15 @@ export default class QueryController {
         if (filter.IS != undefined){
             let key = Object.keys(filter.IS)[0];
             let value = filter.IS[key];
-            if (classes.getbykey(key) == value ){   //cp* reg
+            let reg = new RegExp("^"+(value.replace(/\*/g, ".*"))+"$");
+            if (reg.test(<string>classes.getbykey(key)) ){   //cp* reg
                 return true;
             } return false;
 
         }
         if (filter.NOT != undefined){
             let result = this.helper(classes,filter.NOT);
-            for (let i = 1; i < filter.AND.length; i++){
-                result = result && this.helper(classes,filter.AND[i]);
-            }
+
             return !result;
         }
         return true;
