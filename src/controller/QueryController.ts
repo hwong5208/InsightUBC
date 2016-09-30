@@ -81,7 +81,7 @@ export default class QueryController {
             for (let a of query.GET){
                r[a] = data.getbykey(a);
             }
-            b.push(r);                      // b = a shorter list
+            b.push(r);                      // b is a shorter list
         }
         if(query.ORDER != undefined){
             b.sort(sortbyorder(query.ORDER));
