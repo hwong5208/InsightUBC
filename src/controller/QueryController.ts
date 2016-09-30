@@ -12,25 +12,25 @@ export interface QueryRequest {
     AS: string;
 }
 
-export interface Mcomparator{
+export interface Mcomparator{   //added Math comparator
     [key: string]: number;
 }
 
-export interface Scomparator{
-    [key: string]:string;
+export interface Scomparator{   //added String comparator
+    [key: string]: string;
 }
 
-export interface Filter {
-    AND?:Filter[];
+export interface Filter {   //added
+    AND?:Filter[];          // ? means can have or may not have
     OR?:Filter[];
-    LT?:Mcomparator;
-    GT?:Mcomparator;
-    EQ?:Mcomparator;
+    LT?:Mcomparator;        // less than
+    GT?:Mcomparator;        // greater than
+    EQ?:Mcomparator;        // equal to
     IS?:Scomparator;
     NOT?:Filter;
 }
 
-export interface Responsedata {
+export interface Responsedata {   //added
     courses_dept?:string;
     courses_id?:string;
     courses_avg?:number;
@@ -61,7 +61,6 @@ export default class QueryController {
 
     public query(query: QueryRequest): QueryResponse {
         Log.trace('QueryController::query( ' + JSON.stringify(query) + ' )');
-
         // TODO: implement this
         // By Christine
 
@@ -98,11 +97,7 @@ export default class QueryController {
                 }
             }
         }
-
-
         return {render: query.AS, result: b};
-        // By Christine
-
         //return {status: 'received', ts: new Date().getTime()};
     }
 
@@ -160,7 +155,7 @@ export default class QueryController {
             }
             return !result;
         }
-
         return true;
     }
+    // By Christine
 }
