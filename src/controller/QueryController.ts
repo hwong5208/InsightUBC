@@ -66,7 +66,7 @@ export default class QueryController {
         // By Christine
 
         let id = query.GET[0].split("_")[0];
-        let dataset = this.datasets[id];
+        let dataset = <Array<ClassInformation>>this.datasets[id];
         let result = new Array<ClassInformation>();
 
         for (let data of dataset){
@@ -89,7 +89,7 @@ export default class QueryController {
             function sortbyorder(queryorder:string) {
                 var sortOrder = 1;
 
-                return function (a,b) {
+                return function (a:Responsedata,b:Responsedata) {
                     if(a[queryorder] < b[queryorder])
                         return -1;
                     if(a[queryorder] == b[queryorder])
