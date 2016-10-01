@@ -5,6 +5,7 @@
 import Log from "../Util";
 import JSZip = require('jszip');
 import fs = require('fs');
+import {error} from "util";
 /**
  * In memory representation of all datasets.
  */
@@ -152,17 +153,18 @@ export default class DatasetController {
                     //by Zack
                     let promises:any = [];
 
-                  try{
+                 // try{
                     for(let f in zip.files){
                            // read file
+                       let arr = f.split('.');
+
                         if (zip.file(f)!=null){
                             promises.push( zip.file(f).async("string").then(function (data ) {
 
 
                                 let a = JSON.parse(data);
+//                                if (typeof a.result===undefined){reject(true)};
                                 for (let i in a.result) {
-
-
                                     let b = new ClassInformation();
                                     b.setCourse_dept(a.result[i].Subject);
                                     b.setCourse_id(a.result[i].Course);
@@ -182,11 +184,11 @@ export default class DatasetController {
 
 
                     }
-                    }catch(err){};
+                   // }catch(err){};
                     Promise.all(promises).then( function () {
                         that.save(id, processedDataset)
                     } ).catch(function (err) {
-
+                             reject(true);
                     })
 
                     // by zack
