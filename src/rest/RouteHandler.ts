@@ -84,7 +84,7 @@ export default class RouteHandler {
         }
         return next();
     }
-    /*
+
     // added
     // By Christine
     public static  deleteDataset(req: restify.Request, res: restify.Response, next: restify.Next) {
@@ -104,5 +104,5 @@ export default class RouteHandler {
         }
         return next();
     }
-    */
+
 }
