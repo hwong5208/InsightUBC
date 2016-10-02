@@ -84,4 +84,25 @@ export default class RouteHandler {
         }
         return next();
     }
+    /*
+    // added
+    // By Christine
+    public static  deleteDataset(req: restify.Request, res: restify.Response, next: restify.Next) {
+        Log.trace('RouteHandler::deleteDataset(..) - params: ' + JSON.stringify(req.params));
+        try {
+            let id: string = req.params.id;
+            if (RouteHandler.datasetController.getDataset(id) != null){
+                fs.unlinkSync("./data/"+id);
+                Log.trace('RouteHandler::deleteDataset(..) - processed');
+                res.json(204, {success: 'dataset is deleted'});
+            } else {
+                res.json(404, {status: 'the delete was for a resource that was not previously PUT'});
+            }
+        } catch (err) {
+            Log.error('RouteHandler::deleteDataset(..) - ERROR: ' + err);
+            res.send(404);
+        }
+        return next();
+    }
+    */
 }

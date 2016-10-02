@@ -66,25 +66,25 @@ export default class QueryController {
 
         let id = query.GET[0].split("_")[0];
         let dataset = <Array<ClassInformation>>this.datasets[id];
-
         let result = new Array<ClassInformation>();
 
         for (let data of dataset){
-            if(this.helper(data, query.WHERE) == true){
+            if(this.helperFunction(data, query.WHERE) == true){
                 result.push(data);
             }
         }
-        let b = new Array<Responsedata>();
+
+        let sortedResult = new Array<Responsedata>();
         for (let data of result){
             let r :Responsedata={};
 
             for (let a of query.GET){
                r[a] = data.getbykey(a);
             }
-            b.push(r);                      // b is a shorter list
+            sortedResult.push(r);                      // finalResult is a shorter list
         }
         if(query.ORDER != undefined){
-            b.sort(sortbyorder(query.ORDER));
+            sortedResult.sort(sortbyorder(query.ORDER));
 
             function sortbyorder(queryorder:string) {
                 var sortOrder = 1;
@@ -98,22 +98,22 @@ export default class QueryController {
                 }
             }
         }
-        return {render: query.AS, result: b};
+        return {render: query.AS, result: sortedResult};
         //return {status: 'received', ts: new Date().getTime()};
     }
 
-    public helper(classes:ClassInformation, filter:Filter):boolean{
+    public helperFunction(classes:ClassInformation, filter:Filter):boolean{
         if (filter.AND != undefined){
-            let result = this.helper(classes,filter.AND[0]);
+            let result = this.helperFunction(classes,filter.AND[0]);
             for (let i = 1; i < filter.AND.length; i++){
-                result = result && this.helper(classes,filter.AND[i]);
+                result = result && this.helperFunction(classes,filter.AND[i]);
             }
             return result;
         }
         if (filter.OR != undefined){
-            let result = this.helper(classes,filter.OR[0]);
+            let result = this.helperFunction(classes,filter.OR[0]);
             for (let i = 1; i < filter.OR.length; i++){
-                result = result || this.helper(classes,filter.OR[i]);
+                result = result || this.helperFunction(classes,filter.OR[i]);
             }
             return result;
         }
@@ -151,8 +151,7 @@ export default class QueryController {
 
         }
         if (filter.NOT != undefined){
-            let result = this.helper(classes,filter.NOT);
-
+            let result = this.helperFunction(classes,filter.NOT);
             return !result;
         }
         return true;

@@ -12,7 +12,7 @@ export interface Datasets {
     [id: string]: {};
 }
 
-export class ClassInformation {
+export class ClassInformation { //added
 
     courses_dept:string;
     courses_id:string;
@@ -90,35 +90,32 @@ export default class DatasetController {
     public getDataset(id: string): any {
         // TODO: this should check if the dataset is on disk in ./data if it is not already in memory.
 
-        if (this.datasets.hasOwnProperty(id)){
+        if (this.datasets.hasOwnProperty(id)){ //if there is this key
             return this.datasets[id];
         }
 
-
-        fs.readFile("./data/"+id, function read(err, data) {
+        fs.readFile("./data/"+id, function read(err, data) {  //try to read the content
             if (err) {
                 return null;
             }
             //JSON.parse(data);
             return data;
         });
-
     }
 
 
     public getDatasets(): Datasets {
         // TODO: if datasets is empty, load all dataset files in ./data from disk
-        if (Object.keys(this.datasets).length === 0){
-            let filename = fs.readdirSync('./data');
-            for ( let fn of filename){
-                let data = fs.readFileSync('./data/'+fn,'utf-8');
-                console.log(data);
-                let id = fn.substring(0,fn.lastIndexOf('.'));
-                this.datasets[id]=JSON.parse(data);
+
+        if (Object.keys(this.datasets).length === 0){ //datasets = object, if no key -> datasets is empty
+            let fileNames = fs.readdirSync('./data');
+            for (let f of fileNames){
+                let data = fs.readFileSync('./data/'+f,'utf-8');
+                //console.log(data);
+                let id = f.substring(0,f.lastIndexOf('.'));
+                this.datasets[id]=JSON.parse(data);    // link id with the data
             }
-
         }
-
         return this.datasets;
     }
 
@@ -139,9 +136,8 @@ export default class DatasetController {
                 myZip.loadAsync(data, {base64: true}).then(function (zip: JSZip) {
                     Log.trace('DatasetController::process(..) - unzipped');
 
-       //             let processedDataset = {};
+                    //let processedDataset = {};
                     let processedDataset:any = [];
-
 
                     // TODO: iterate through files in zip (zip.files)
                     // The contents of the file will depend on the id provided. e.g.,
@@ -158,10 +154,8 @@ export default class DatasetController {
                         if (zip.file(f)!=null){
                             promises.push( zip.file(f).async("string").then(function (data ) {
 
-
                                 let a = JSON.parse(data);
                                 for (let i in a.result) {
-
 
                                     let b = new ClassInformation();
                                     b.setCourse_dept(a.result[i].Subject);
@@ -175,12 +169,8 @@ export default class DatasetController {
 
                                     processedDataset.push(b);
                                 }
-
                             }));
                         }
-
-
-
                     }
                     }catch(err){};
                     Promise.all(promises).then( function () {
@@ -190,7 +180,6 @@ export default class DatasetController {
                     })
 
                     // by zack
-
 
                     fulfill(true);
                 }).catch(function (err) {
@@ -219,20 +208,12 @@ export default class DatasetController {
 
         // create the './data' folder if it does't exist
         //by Zack
-
-//        console.log( fs.lstat('/'+id));
+        //console.log( fs.lstat('/'+id));
         let dir = './data/';
 
         if(!fs.existsSync(dir)){
             fs.mkdirSync(dir);
-
         }
-
-
         fs.writeFile('./data/'+id,JSON.stringify(processedDataset) );
-
-
-
-
     }
 }
