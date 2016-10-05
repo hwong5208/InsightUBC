@@ -214,8 +214,7 @@ export default class DatasetController {
                     })
 
                     // by zack
-
-
+                    
                     fulfill(true);
                 }).catch(function (err) {
                     Log.trace('DatasetController::process(..) - unzip ERROR: ' + err.message);
