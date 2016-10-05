@@ -142,28 +142,13 @@ export default class DatasetController {
 
        //             let processedDataset = {};
                     let processedDataset:any = [];
-
-
-                    // TODO: iterate through files in zip (zip.files)
-                    // The contents of the file will depend on the id provided. e.g.,
-                    // some zips will contain .html files, some will contain .json files.
-                    // You can depend on 'id' to differentiate how the zip should be handled,
-                    // although you should still be tolerant to errors.
-
-                    //by Zack
+                    let folder: JSZip = zip.folder(id);
                     let promises:any = [];
-
-                 // try{
-                    for(let f in zip.files){
-                           // read file
-                       let arr = f.split('.');
-
-                        if (zip.file(f)!=null){
-                            promises.push( zip.file(f).async("string").then(function (data ) {
-
-
+                    folder.forEach(function(path, file){
+                        if(!file.dir){
+                            promises.push(file.async("string").then(function (data ){
                                 let a = JSON.parse(data);
-//                                if (typeof a.result===undefined){reject(true)};
+                                if (typeof a.result===undefined){reject(true)};
                                 for (let i in a.result) {
                                     let b = new ClassInformation();
                                     b.setCourse_dept(a.result[i].Subject);
@@ -177,13 +162,50 @@ export default class DatasetController {
 
                                     processedDataset.push(b);
                                 }
+                        }))}
+                    });
+                    // TODO: iterate through files in zip (zip.files)
+                    // The contents of the file will depend on the id provided. e.g.,
+                    // some zips will contain .html files, some will contain .json files.
+                    // You can depend on 'id' to differentiate how the zip should be handled,
+                    // although you should still be tolerant to errors.
 
-                            }));
-                        }
+                    //by Zack
+                    //let promises:any = [];
 
+                 // try{
 
+                    // for(let f in zip.files){
+                    //        // read file
+                    // //   let arr = f.split('.');
+                    //
+                    //     if (zip.file(f)!=null){
+                    //         promises.push( zip.file(f).async("string").then(function (data ) {
+                    //
+                    //
+                    //             let a = JSON.parse(data);
+                    //            if (typeof a.result===undefined){reject(true)};
+                    //             for (let i in a.result) {
+                    //                 let b = new ClassInformation();
+                    //                 b.setCourse_dept(a.result[i].Subject);
+                    //                 b.setCourse_id(a.result[i].Course);
+                    //                 b.setCourse_avg(a.result[i].Avg);
+                    //                 b.setCourse_instructor(a.result[i].Professor);
+                    //                 b.setCourse_title(a.result[i].Title);
+                    //                 b.setCourse_pass(a.result[i].Pass);
+                    //                 b.setCourse_fail(a.result[i].Fail);
+                    //                 b.setCourse_audit(a.result[i].Audit);
+                    //
+                    //                 processedDataset.push(b);
+                    //             }
+                    //
+                    //         }));
+                    //     }
+                    //
+                    //
+                    //
+                    // }
 
-                    }
                    // }catch(err){};
                     Promise.all(promises).then( function () {
                         that.save(id, processedDataset)
