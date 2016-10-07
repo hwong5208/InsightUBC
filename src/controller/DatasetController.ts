@@ -92,34 +92,23 @@ export default class DatasetController {
         // TODO: this should check if the dataset is on disk in ./data if it is not already in memory.
 
         if (this.datasets.hasOwnProperty(id)){
-            return this.datasets[id];
-        }
-
-
-        fs.readFile("./data/"+id, function read(err, data) {
-            if (err) {
-                return null;
-            }
-            //JSON.parse(data);
-            return data;
-        });
-
+            return this.datasets[id]; }
+        let data = fs.readFileSync('./data','utf8');
+        this.datasets[id] = JSON.parse(data);
+        return this.datasets[id];
     }
 
 
     public getDatasets(): Datasets {
         // TODO: if datasets is empty, load all dataset files in ./data from disk
         if (Object.keys(this.datasets).length === 0){
-            let filename = fs.readdirSync('./data');
-            for ( let fn of filename){
-                let data = fs.readFileSync('./data/'+fn,'utf-8');
-                console.log(data);
-                let id = fn.substring(0,fn.lastIndexOf('.'));
+            let fileNames = fs.readdirSync('./data');
+            for ( let f of fileNames){
+                let data = fs.readFileSync('./data/'+f,'utf-8');
+                let id = f.substring(0,f.lastIndexOf('.'));
                 this.datasets[id]=JSON.parse(data);
             }
-
         }
-
         return this.datasets;
     }
 
@@ -139,31 +128,7 @@ export default class DatasetController {
                 let myZip = new JSZip();
                 myZip.loadAsync(data, {base64: true}).then(function (zip: JSZip) {
                     Log.trace('DatasetController::process(..) - unzipped');
-
-       //             let processedDataset = {};
                     let processedDataset:any = [];
-                    let folder: JSZip = zip.folder(id);
-                    let promises:any = [];
-                    folder.forEach(function(path, file){
-                        if(!file.dir){
-                            promises.push(file.async("string").then(function (data ){
-                                let a = JSON.parse(data);
-                                if (typeof a.result===undefined){reject(true)};
-                                for (let i in a.result) {
-                                    let b = new ClassInformation();
-                                    b.setCourse_dept(a.result[i].Subject);
-                                    b.setCourse_id(a.result[i].Course);
-                                    b.setCourse_avg(a.result[i].Avg);
-                                    b.setCourse_instructor(a.result[i].Professor);
-                                    b.setCourse_title(a.result[i].Title);
-                                    b.setCourse_pass(a.result[i].Pass);
-                                    b.setCourse_fail(a.result[i].Fail);
-                                    b.setCourse_audit(a.result[i].Audit);
-
-                                    processedDataset.push(b);
-                                }
-                        }))}
-                    });
                     // TODO: iterate through files in zip (zip.files)
                     // The contents of the file will depend on the id provided. e.g.,
                     // some zips will contain .html files, some will contain .json files.
@@ -171,50 +136,79 @@ export default class DatasetController {
                     // although you should still be tolerant to errors.
 
                     //by Zack
-                    //let promises:any = [];
 
-                 // try{
+                    let promises:any = [];
+  //                  try{
+                    for(let f in zip.files){
+                         if (zip.file(f)!=null){
+                            promises.push( zip.file(f).async("string").then(function (data ) {
+                                let a = JSON.parse(data);
+                                 if(a.result == undefined) {
+                                     reject(false);
+                                 //    throw error();
+                                 }else{
+                                for (let i in a.result) {
+                                    let b = new ClassInformation();
 
-                    // for(let f in zip.files){
-                    //        // read file
-                    // //   let arr = f.split('.');
-                    //
-                    //     if (zip.file(f)!=null){
-                    //         promises.push( zip.file(f).async("string").then(function (data ) {
-                    //
-                    //
-                    //             let a = JSON.parse(data);
-                    //            if (typeof a.result===undefined){reject(true)};
-                    //             for (let i in a.result) {
-                    //                 let b = new ClassInformation();
-                    //                 b.setCourse_dept(a.result[i].Subject);
-                    //                 b.setCourse_id(a.result[i].Course);
-                    //                 b.setCourse_avg(a.result[i].Avg);
-                    //                 b.setCourse_instructor(a.result[i].Professor);
-                    //                 b.setCourse_title(a.result[i].Title);
-                    //                 b.setCourse_pass(a.result[i].Pass);
-                    //                 b.setCourse_fail(a.result[i].Fail);
-                    //                 b.setCourse_audit(a.result[i].Audit);
-                    //
-                    //                 processedDataset.push(b);
-                    //             }
-                    //
-                    //         }));
-                    //     }
-                    //
-                    //
-                    //
-                    // }
+                                        b.setCourse_dept(a.result[i].Subject);
+                                        b.setCourse_id(a.result[i].Course);
+                                        b.setCourse_avg(a.result[i].Avg);
+                                        b.setCourse_instructor(a.result[i].Professor);
+                                        b.setCourse_title(a.result[i].Title);
+                                        b.setCourse_pass(a.result[i].Pass);
+                                        b.setCourse_fail(a.result[i].Fail);
+                                        b.setCourse_audit(a.result[i].Audit);
+                                        processedDataset.push(b);
 
-                   // }catch(err){};
+                                } }}))}    }
+    //                }catch(err){ reject(false)};
                     Promise.all(promises).then( function () {
                         that.save(id, processedDataset)
                     } ).catch(function (err) {
-                             reject(true);
+                             reject(false);
                     })
 
+
+                    //by Zack
+/*
+                    let promises:any[] = [];
+                    for(let f in zip.files){
+                        if (zip.file(f)!=null){
+                            promises.push( zip.file(f).async("string"));}    }
+                    // }catch(err){};
+                    Promise.all(promises).then( function (res:string[]) {
+                        let a = JSON.parse(res[0]);
+                           if(a.result== undefined){return reject(false)}else{
+
+                            for (let i in a.result) {
+                                let b = new ClassInformation();
+                                b.setCourse_dept(a.result[i].Subject);
+                                b.setCourse_id(a.result[i].Course);
+                                b.setCourse_avg(a.result[i].Avg);
+                                b.setCourse_instructor(a.result[i].Professor);
+                                b.setCourse_title(a.result[i].Title);
+                                b.setCourse_pass(a.result[i].Pass);
+                                b.setCourse_fail(a.result[i].Fail);
+                                b.setCourse_audit(a.result[i].Audit);
+                                processedDataset.push(b);
+
+                        }}
+
+
+                    } )
+                        .then(function () {
+                        that.save(id, processedDataset)
+                    })
+*/
+
+
+
+
+
+
                     // by zack
-                    
+
+
                     fulfill(true);
                 }).catch(function (err) {
                     Log.trace('DatasetController::process(..) - unzip ERROR: ' + err.message);
