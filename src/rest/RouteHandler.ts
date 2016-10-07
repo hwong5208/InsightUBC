@@ -54,11 +54,11 @@ export default class RouteHandler {
                     }else {
                         res.json(201, {success:result});
                     }
-                    //Log.trace('RouteHandler::postDataset(..) - processed');
+                    Log.trace('RouteHandler::postDataset(..) - processed');
                     //res.json(200, {success: result});
                 }).catch(function (err: Error) {
                     Log.trace('RouteHandler::postDataset(..) - ERROR: ' + err.message);
-                    res.json(400, {err: err.message});
+                    res.json(400, {error: err.message});
                 });
             });
 
