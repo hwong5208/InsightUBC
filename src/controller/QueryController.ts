@@ -180,5 +180,5 @@ export default class QueryController {
         }
         return true;
     }
-    // By Christine
+    
 }
