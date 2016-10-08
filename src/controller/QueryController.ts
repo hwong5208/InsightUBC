@@ -20,7 +20,7 @@ export interface Scomparator{   //added String comparator
     [key: string]: string;
 }
 
-export interface Filter {   //added
+export interface Filter {   //added Filter
     AND?:Filter[];          // ? means can have or may not have
     OR?:Filter[];
     LT?:Mcomparator;        // less than
