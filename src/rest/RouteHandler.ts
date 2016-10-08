@@ -82,7 +82,10 @@ export default class RouteHandler {
             if (isValid === true) {
                 console.log("is valid true")
                 let result = controller.query(query);
-                res.json(200, result);
+                if(result instanceof Array){ res.json(424, {missing: result});}
+                else {
+                    res.json(200, result);
+                }
             } else {
                 console.log("is valid false")
                 res.json(400, {error: 'invalid query'});

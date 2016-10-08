@@ -280,11 +280,7 @@ export default class DatasetController {
             fs.mkdirSync(dir);
 
         }
-
-
         fs.writeFile('./data/'+id,JSON.stringify(processedDataset) );
-
-
 
 
     }

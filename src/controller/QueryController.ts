@@ -68,13 +68,26 @@ export default class QueryController {
         // By Christine
 
         let id = query.GET[0].split("_")[0];
+        let idarray:any[] = [];
+        for(let arrget of query.GET) {
+            if (this.datasets[id] == undefined) {
+                idarray.push(id);
+            }
+        }
+
+        if(idarray.length> 0){ return idarray}
         let dataset = <Array<ClassInformation>>this.datasets[id];
         let result = new Array<ClassInformation>();
 
-        for (let data of dataset){
-            if(this.helperFunction(data, query.WHERE) == true){
-                result.push(data);
+        try {
+            for (let data of dataset) {
+                if (this.helperFunction(data, query.WHERE) == true) {
+                    result.push(data);
+                }
             }
+        }catch (err){
+            idarray.push(err.message);
+            return idarray
         }
 
         let sortedResult = new Array<Responsedata>();
@@ -122,6 +135,8 @@ export default class QueryController {
         }
         if (filter.GT != undefined){
             let key = Object.keys(filter.GT)[0];
+            let id = key.split("_")[0];
+            if (this.datasets[id]== undefined){throw new Error(id)}
             let value = filter.GT[key];
             if (classes.getbykey(key) > value ){
                 return true;
@@ -130,6 +145,8 @@ export default class QueryController {
         }
         if (filter.LT != undefined){
             let key = Object.keys(filter.LT)[0];
+            let id = key.split("_")[0];
+            if (this.datasets[id]== undefined){throw new Error(id)}
             let value = filter.LT[key];
             if (classes.getbykey(key) < value ){
                 return true;
@@ -138,6 +155,8 @@ export default class QueryController {
         }
         if (filter.EQ != undefined){
             let key = Object.keys(filter.EQ)[0];
+            let id = key.split("_")[0];
+            if (this.datasets[id]== undefined){throw new Error(id)}
             let value = filter.EQ[key];
             if (classes.getbykey(key) == value ){
                 return true;
@@ -146,6 +165,8 @@ export default class QueryController {
         }
         if (filter.IS != undefined){
             let key = Object.keys(filter.IS)[0];
+            let id = key.split("_")[0];
+            if (this.datasets[id]== undefined){throw new Error(id)}
             let value = filter.IS[key];
             let reg = new RegExp("^"+(value.replace(/\*/g, ".*"))+"$");
             if (reg.test(<string>classes.getbykey(key)) ){   //cp* reg
