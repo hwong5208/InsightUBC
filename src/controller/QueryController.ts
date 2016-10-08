@@ -19,7 +19,7 @@ export interface Mcomparator{   //added Math comparator
 export interface Scomparator{   //added String comparator
     [key: string]: string;
 }
-//
+
 export interface Filter {   //added
     AND?:Filter[];          // ? means can have or may not have
     OR?:Filter[];
