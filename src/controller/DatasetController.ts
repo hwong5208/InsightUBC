@@ -228,9 +228,15 @@ export default class DatasetController {
                          }
 
 
+                       if( that.datasets[id]== undefined){
+                           that.save(id, processedDataset);
+                           fulfill(true);
+                       }else{
+                           that.save(id, processedDataset);
+                           fulfill(false);
+                       }
 
-                        that.save(id, processedDataset);
-                        fulfill(true);
+
                     } ).catch(function (err) {
                         reject(err);
                        // throw err;
@@ -282,4 +288,10 @@ export default class DatasetController {
 
 
     }
+
+    public deleteDataSets(id:string){
+    this.datasets[id] = undefined;
+    }
+
+
 }

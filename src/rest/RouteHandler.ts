@@ -51,8 +51,10 @@ export default class RouteHandler {
                 controller.process(id, req.body).then(function (result) {
                     if (result) {
                         res.json(204, {success:result});
+                        console.log("204")
                     }else {
                         res.json(201, {success:result});
+                        console.log("201")
                     }
                     Log.trace('RouteHandler::postDataset(..) - processed');
                     //res.json(200, {success: result});
@@ -78,14 +80,16 @@ export default class RouteHandler {
             let isValid = controller.isValid(query);
 
             if (isValid === true) {
+                console.log("is valid true")
                 let result = controller.query(query);
                 res.json(200, result);
             } else {
-                res.json(400, {status: 'invalid query'});
+                console.log("is valid false")
+                res.json(400, {error: 'invalid query'});
             }
         } catch (err) {
             Log.error('RouteHandler::postQuery(..) - ERROR: ' + err);
-            res.send(403);
+            res.send(400,{error: 'invalid query'});
         }
         return next();
     }
@@ -96,12 +100,15 @@ export default class RouteHandler {
         Log.trace('RouteHandler::deleteDataset(..) - params: ' + JSON.stringify(req.params));
         try {
             let id: string = req.params.id;
-            if (RouteHandler.datasetController.getDataset(id) != null){
+            if (RouteHandler.datasetController.getDataset(id) != undefined){
                 fs.unlinkSync("./data/"+id);
+                RouteHandler.datasetController.deleteDataSets(id);
                 Log.trace('RouteHandler::deleteDataset(..) - processed');
                 res.json(204, {success: 'dataset is deleted'});
+                console.log(" delete: 204")
             } else {
                 res.json(404, {status: 'the delete was for a resource that was not previously PUT'});
+                console.log("delete: 404")
             }
         } catch (err) {
             Log.error('RouteHandler::deleteDataset(..) - ERROR: ' + err);

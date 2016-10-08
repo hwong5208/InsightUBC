@@ -28,7 +28,7 @@ $(function () {
             query = JSON.parse(query);
 
             $.post("/query", query, function (data) {
-                if (data["render"] === "table") {
+                if (data["render"] === "TABLE") {
                     generateTable(data["result"]);
                 }
             }).fail(function (e) {

@@ -6,8 +6,8 @@ import {Datasets, ClassInformation} from "./DatasetController";
 import Log from "../Util";
 
 export interface QueryRequest {
-    GET: string|string[];
-    WHERE: {};
+    GET: string[];
+    WHERE: Filter;
     ORDER: string;
     AS: string;
 }
@@ -53,7 +53,10 @@ export default class QueryController {
     }
 
     public isValid(query: QueryRequest): boolean {
-        if (typeof query !== 'undefined' && query !== null && Object.keys(query).length > 0) {
+        if (typeof query !== 'undefined' && query !== null && Object.keys(query).length > 0&& query.AS != undefined &&query.GET!= undefined && query.WHERE!= undefined ) {
+            if (query.ORDER != undefined){
+                if (query.GET.indexOf(query.ORDER) == -1){ return false;}
+            }
             return true;
         }
         return false;
