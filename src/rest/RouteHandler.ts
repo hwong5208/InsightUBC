@@ -49,11 +49,11 @@ export default class RouteHandler {
 
                 let controller = RouteHandler.datasetController;
                 controller.process(id, req.body).then(function (result) {
-                    if (result) {
-                        res.json(204, {success:result});
+                    if (result) {                         //result -> fulfill(true)
+                        res.json(204, {success:result});  //id was new
                         console.log("204")
-                    }else {
-                        res.json(201, {success:result});
+                    }else {                               //result -> fulfill(false)
+                        res.json(201, {success:result});  // id already existed
                         console.log("201")
                     }
                     Log.trace('RouteHandler::postDataset(..) - processed');
@@ -80,14 +80,14 @@ export default class RouteHandler {
             let isValid = controller.isValid(query);
 
             if (isValid === true) {
-                console.log("is valid true")
+                console.log("is valid true");
                 let result = controller.query(query);
                 if(result instanceof Array){ res.json(424, {missing: result});}
                 else {
                     res.json(200, result);
                 }
             } else {
-                console.log("is valid false")
+                console.log("is valid false");
                 res.json(400, {error: 'invalid query'});
             }
         } catch (err) {
@@ -97,8 +97,7 @@ export default class RouteHandler {
         return next();
     }
 
-    // added
-    // By Christine
+    // added deleteDataset
     public static  deleteDataset(req: restify.Request, res: restify.Response, next: restify.Next) {
         Log.trace('RouteHandler::deleteDataset(..) - params: ' + JSON.stringify(req.params));
         try {
@@ -119,5 +118,4 @@ export default class RouteHandler {
         }
         return next();
     }
-
 }

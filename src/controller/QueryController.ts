@@ -53,10 +53,12 @@ export default class QueryController {
     }
 
     public isValid(query: QueryRequest): boolean {
-        if (typeof query !== 'undefined' && query !== null && Object.keys(query).length > 0&& query.AS != undefined &&query.GET!= undefined && query.WHERE!= undefined ) {
+        if (typeof query !== 'undefined' && query !== null && Object.keys(query).length > 0 && query.AS != undefined && query.GET != undefined && query.WHERE != undefined){
             if (query.ORDER != undefined){
-                if (query.GET.indexOf(query.ORDER) == -1){ return false;}
-            }
+                if (query.GET.indexOf(query.ORDER) == -1){  //indexOf() returns the position of the first occurence of
+                    return false;                           //a specified value in a string
+                }                                           //indexOf()check if the string in ORDER is in GET
+            }                                               //it will return -1 if the string in ORDER is not in GET
             return true;
         }
         return false;
@@ -65,18 +67,18 @@ export default class QueryController {
     public query(query: QueryRequest): QueryResponse {
         Log.trace('QueryController::query( ' + JSON.stringify(query) + ' )');
         // TODO: implement this
-        // By Christine
 
-        let id = query.GET[0].split("_")[0];
+        let id = query.GET[0].split("_")[0];  //e.g. courses_dept -> id = courses, key = dept
         let idarray:any[] = [];
-        for(let arrget of query.GET) {
+        for(let item of query.GET) {
             if (this.datasets[id] == undefined) {
                 idarray.push(id);
             }
         }
-
-        if(idarray.length> 0){ return idarray}
-        let dataset = <Array<ClassInformation>>this.datasets[id];
+        if(idarray.length > 0){
+            return idarray;
+        }
+        let dataset = <Array<ClassInformation>>this.datasets[id]; //get the corresponding dataset
         let result = new Array<ClassInformation>();
 
         try {
@@ -87,25 +89,25 @@ export default class QueryController {
             }
         }catch (err){
             idarray.push(err.message);
-            return idarray
+            return idarray;
         }
 
-        let sortedResult = new Array<Responsedata>();
+        let finalResult = new Array<Responsedata>();
         for (let data of result){
-            let r :Responsedata={};
+            let r: Responsedata = {};
 
             for (let a of query.GET){
-               r[a] = data.getbykey(a);
+               r[a] = data.getbykey(a); //get the data by key
             }
-            sortedResult.push(r);                      // finalResult is a shorter list
+            finalResult.push(r);        //finalResult is a list with only the data we want
         }
         if(query.ORDER != undefined){
-            sortedResult.sort(sortbyorder(query.ORDER));
+            finalResult.sort(sortbyorder(query.ORDER)); //sort the finalResult
 
             function sortbyorder(queryorder:string) {
-                var sortOrder = 1;
+                let sortOrder = 1;
 
-                return function (a:Responsedata,b:Responsedata) {
+                return function (a:Responsedata, b:Responsedata) {
                     if(a[queryorder] < b[queryorder])
                         return -1;
                     if(a[queryorder] == b[queryorder])
@@ -114,7 +116,7 @@ export default class QueryController {
                 }
             }
         }
-        return {render: query.AS, result: sortedResult};
+        return {render: query.AS, result: finalResult};  //render the finalResult according to AS
         //return {status: 'received', ts: new Date().getTime()};
     }
 
@@ -134,45 +136,41 @@ export default class QueryController {
             return result;
         }
         if (filter.GT != undefined){
-            let key = Object.keys(filter.GT)[0];
-            let id = key.split("_")[0];
-            if (this.datasets[id]== undefined){throw new Error(id)}
-            let value = filter.GT[key];
-            if (classes.getbykey(key) > value ){
+            let key = Object.keys(filter.GT)[0];  //e.g. "courses_avg"
+            let id = key.split("_")[0];           //e.g. id = "courses"
+            if (this.datasets[id] == undefined){throw new Error(id)} //check if dataset has this id
+            let value = filter.GT[key];           //e.g. value = 70
+            if (classes.getbykey(key) > value){
                 return true;
             } return false;
-
         }
         if (filter.LT != undefined){
-            let key = Object.keys(filter.LT)[0];
-            let id = key.split("_")[0];
-            if (this.datasets[id]== undefined){throw new Error(id)}
-            let value = filter.LT[key];
-            if (classes.getbykey(key) < value ){
+            let key = Object.keys(filter.LT)[0];  //e.g. "courses_avg"
+            let id = key.split("_")[0];           //e.g. id = "courses"
+            if (this.datasets[id] == undefined){throw new Error(id)} //check if dataset has this id
+            let value = filter.LT[key];           //e.g. value = 70
+            if (classes.getbykey(key) < value){
                 return true;
             } return false;
-
         }
         if (filter.EQ != undefined){
-            let key = Object.keys(filter.EQ)[0];
-            let id = key.split("_")[0];
-            if (this.datasets[id]== undefined){throw new Error(id)}
-            let value = filter.EQ[key];
-            if (classes.getbykey(key) == value ){
+            let key = Object.keys(filter.EQ)[0];  //e.g. "courses_avg"
+            let id = key.split("_")[0];           //e.g. id = "courses"
+            if (this.datasets[id] == undefined){throw new Error(id)} //check if dataset has this id
+            let value = filter.EQ[key];           //e.g. value = 70
+            if (classes.getbykey(key) == value){
                 return true;
             } return false;
-
         }
         if (filter.IS != undefined){
-            let key = Object.keys(filter.IS)[0];
-            let id = key.split("_")[0];
-            if (this.datasets[id]== undefined){throw new Error(id)}
-            let value = filter.IS[key];
-            let reg = new RegExp("^"+(value.replace(/\*/g, ".*"))+"$");
-            if (reg.test(<string>classes.getbykey(key)) ){   //cp* reg
-                return true;
+            let key = Object.keys(filter.IS)[0];  //e.g. "courses_dept"
+            let id = key.split("_")[0];           //e.g. id = "courses"
+            if (this.datasets[id] == undefined){throw new Error(id)} //check if dataset has this id
+            let value = filter.IS[key];           //e.g. value = "adhe"
+            let reg = new RegExp("^"+(value.replace(/\*/g, ".*"))+"$"); //^ matches beginning of input, $ matches end of input
+            if (reg.test(<string>classes.getbykey(key)) ){   //cp* reg  //test() executes a search for a match between
+                return true;                                            //a regular expression and a specified string
             } return false;
-
         }
         if (filter.NOT != undefined){
             let result = this.helperFunction(classes,filter.NOT);
@@ -180,5 +178,4 @@ export default class QueryController {
         }
         return true;
     }
-
 }
