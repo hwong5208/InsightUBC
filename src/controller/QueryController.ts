@@ -7,7 +7,7 @@ import Log from "../Util";
 
 export interface QueryRequest {
     GET: string[];
-    WHERE: Filter;
+    WHERE:  Filter| {};
     ORDER: string;
     AS: string;
 }
@@ -68,6 +68,7 @@ export default class QueryController {
         Log.trace('QueryController::query( ' + JSON.stringify(query) + ' )');
         // TODO: implement this
 
+        // return 424 if the query failed
         let id = query.GET[0].split("_")[0];  //e.g. courses_dept -> id = courses, key = dept
         let idarray:any[] = [];
         for(let item of query.GET) {
@@ -78,6 +79,8 @@ export default class QueryController {
         if(idarray.length > 0){
             return idarray;
         }
+
+
         let dataset = <Array<ClassInformation>>this.datasets[id]; //get the corresponding dataset
         let result = new Array<ClassInformation>();
 

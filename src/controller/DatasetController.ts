@@ -142,7 +142,7 @@ export default class DatasetController {
                     // although you should still be tolerant to errors.
 
                     let processedDataset:any = [];
-                    let folder: JSZip = zip.folder(id);
+                  //  let folder: JSZip = zip.folder(id);
                     let promises:any[] = [];
                     for(let file in zip.files){
                        // console.log(file);
