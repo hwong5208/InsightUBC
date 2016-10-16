@@ -139,10 +139,17 @@ export default class QueryController {
             return result;
         }
         if (filter.GT != undefined){
+        //    console.log(filter.GT);
             let key = Object.keys(filter.GT)[0];  //e.g. "courses_avg"
+        //    console.log("key:"+key);
             let id = key.split("_")[0];           //e.g. id = "courses"
-            if (this.datasets[id] == undefined){throw new Error(id)} //check if dataset has this id
+     //        if(key[0]== "["){  id = id.substring(1);} // added d2
+        //    console.log("id: "+id);
+            if (this.datasets[id] == undefined){
+                console.log("GT error");
+                throw new Error(id)} //check if dataset has this id
             let value = filter.GT[key];           //e.g. value = 70
+
             if (classes.getbykey(key) > value){
                 return true;
             } return false;
@@ -150,7 +157,10 @@ export default class QueryController {
         if (filter.LT != undefined){
             let key = Object.keys(filter.LT)[0];  //e.g. "courses_avg"
             let id = key.split("_")[0];           //e.g. id = "courses"
-            if (this.datasets[id] == undefined){throw new Error(id)} //check if dataset has this id
+       //     if(key[0]== "["){  id = id.substring(1);} // added d2
+            if (this.datasets[id] == undefined){
+                console.log("LT error");
+                throw new Error(id)} //check if dataset has this id
             let value = filter.LT[key];           //e.g. value = 70
             if (classes.getbykey(key) < value){
                 return true;
@@ -159,7 +169,10 @@ export default class QueryController {
         if (filter.EQ != undefined){
             let key = Object.keys(filter.EQ)[0];  //e.g. "courses_avg"
             let id = key.split("_")[0];           //e.g. id = "courses"
-            if (this.datasets[id] == undefined){throw new Error(id)} //check if dataset has this id
+         //   if(key[0]== "["){  id = id.substring(1);} // added d2
+            if (this.datasets[id] == undefined){
+                console.log("EQ error");
+                throw new Error(id)} //check if dataset has this id
             let value = filter.EQ[key];           //e.g. value = 70
             if (classes.getbykey(key) == value){
                 return true;
@@ -168,7 +181,10 @@ export default class QueryController {
         if (filter.IS != undefined){
             let key = Object.keys(filter.IS)[0];  //e.g. "courses_dept"
             let id = key.split("_")[0];           //e.g. id = "courses"
-            if (this.datasets[id] == undefined){throw new Error(id)} //check if dataset has this id
+        //    if(key[0]== "["){  id = id.substring(1);} // added d2
+            if (this.datasets[id] == undefined){
+                console.log("IS error");
+                throw new Error(id)} //check if dataset has this id
             let value = filter.IS[key];           //e.g. value = "adhe"
             let reg = new RegExp("^"+(value.replace(/\*/g, ".*"))+"$"); //^ matches beginning of input, $ matches end of input
             if (reg.test(<string>classes.getbykey(key)) ){   //cp* reg  //test() executes a search for a match between

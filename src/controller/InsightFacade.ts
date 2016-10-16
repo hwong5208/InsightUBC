@@ -83,12 +83,14 @@ export default class InsightFacade implements IInsightFacade {
                 if (isValid === true) {
                     console.log("is valid true");
                     let result = controller.query(query);
-                    if(result instanceof Array){ //res.json(424, {missing: result});
-                        reject({code:424,body: {missing: result}});
-                    }
-                    else {
+                         if(result instanceof Array){ //res.json(424, {missing: result});
+                      reject({code:424,body: {missing: result}});
+                          console.log("424, insigtfacades reject ")
+                       }
+                       else {
                        // res.json(200, result);
                         fulfill({code:200,body: result});
+                        console.log("200, insigtfacades fulfill ")
                     }
                 } else {
                     console.log("is valid false");
