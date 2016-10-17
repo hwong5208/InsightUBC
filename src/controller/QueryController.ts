@@ -4,11 +4,14 @@
 
 import {Datasets, ClassInformation} from "./DatasetController";
 import Log from "../Util";
+import {App} from "../App";
 
 export interface QueryRequest {
     GET: string[];
-    WHERE:  Filter| {};
-    ORDER: string;
+    WHERE:  Filter| {}; // <- "{}" should all row should return
+    GROUP?:string[];            //d2 added
+    APPLY?:Apply;               //d2 added
+    ORDER: string
     AS: string;
 }
 
@@ -30,6 +33,18 @@ export interface Filter {   //added
     NOT?:Filter;
 }
 
+export interface Apply {     //added D2
+    MAX?:Mcomparator;
+    MIN?:Mcomparator;
+    AVG?: Mcomparator;
+    COUNT?:number;
+}
+
+export  interface Order {
+    UP?: string;
+    DOWN?:string;
+}
+
 export interface Responsedata {   //added
     courses_dept?:string;
     courses_id?:string;
@@ -40,6 +55,7 @@ export interface Responsedata {   //added
     courses_fail?:number;
     courses_audit?:number;
     [key: string]:string|number;
+
 }
 
 export interface QueryResponse {
@@ -86,7 +102,7 @@ export default class QueryController {
 
         try {
             for (let data of dataset) {
-                if (this.helperFunction(data, query.WHERE) == true) {
+                if (this.helperFunctionFilter(data, query.WHERE) == true) {
                     result.push(data);
                 }
             }
@@ -104,6 +120,9 @@ export default class QueryController {
             }
             finalResult.push(r);        //finalResult is a list with only the data we want
         }
+
+
+
         if(query.ORDER != undefined){
             finalResult.sort(sortbyorder(query.ORDER)); //sort the finalResult
 
@@ -123,18 +142,18 @@ export default class QueryController {
         //return {status: 'received', ts: new Date().getTime()};
     }
 
-    public helperFunction(classes:ClassInformation, filter:Filter):boolean{
+    public helperFunctionFilter(classes:ClassInformation, filter:Filter):boolean{
         if (filter.AND != undefined){
-            let result = this.helperFunction(classes,filter.AND[0]);
+            let result = this.helperFunctionFilter(classes,filter.AND[0]);
             for (let i = 1; i < filter.AND.length; i++){
-                result = result && this.helperFunction(classes,filter.AND[i]);
+                result = result && this.helperFunctionFilter(classes,filter.AND[i]);
             }
             return result;
         }
         if (filter.OR != undefined){
-            let result = this.helperFunction(classes,filter.OR[0]);
+            let result = this.helperFunctionFilter(classes,filter.OR[0]);
             for (let i = 1; i < filter.OR.length; i++){
-                result = result || this.helperFunction(classes,filter.OR[i]);
+                result = result || this.helperFunctionFilter(classes,filter.OR[i]);
             }
             return result;
         }
@@ -143,7 +162,7 @@ export default class QueryController {
             let key = Object.keys(filter.GT)[0];  //e.g. "courses_avg"
         //    console.log("key:"+key);
             let id = key.split("_")[0];           //e.g. id = "courses"
-     //        if(key[0]== "["){  id = id.substring(1);} // added d2
+
         //    console.log("id: "+id);
             if (this.datasets[id] == undefined){
                 console.log("GT error");
@@ -157,7 +176,7 @@ export default class QueryController {
         if (filter.LT != undefined){
             let key = Object.keys(filter.LT)[0];  //e.g. "courses_avg"
             let id = key.split("_")[0];           //e.g. id = "courses"
-       //     if(key[0]== "["){  id = id.substring(1);} // added d2
+
             if (this.datasets[id] == undefined){
                 console.log("LT error");
                 throw new Error(id)} //check if dataset has this id
@@ -169,7 +188,6 @@ export default class QueryController {
         if (filter.EQ != undefined){
             let key = Object.keys(filter.EQ)[0];  //e.g. "courses_avg"
             let id = key.split("_")[0];           //e.g. id = "courses"
-         //   if(key[0]== "["){  id = id.substring(1);} // added d2
             if (this.datasets[id] == undefined){
                 console.log("EQ error");
                 throw new Error(id)} //check if dataset has this id
@@ -181,7 +199,6 @@ export default class QueryController {
         if (filter.IS != undefined){
             let key = Object.keys(filter.IS)[0];  //e.g. "courses_dept"
             let id = key.split("_")[0];           //e.g. id = "courses"
-        //    if(key[0]== "["){  id = id.substring(1);} // added d2
             if (this.datasets[id] == undefined){
                 console.log("IS error");
                 throw new Error(id)} //check if dataset has this id
@@ -192,9 +209,44 @@ export default class QueryController {
             } return false;
         }
         if (filter.NOT != undefined){
-            let result = this.helperFunction(classes,filter.NOT);
+            let result = this.helperFunctionFilter(classes,filter.NOT);
             return !result;
         }
         return true;
     }
+
+    public helperFunctionGroup(FilteredData:Responsedata[], groups:string[]): Responsedata[][]{
+
+        let groupedDatas = new Array;
+
+        let groupedData = new Array;
+
+
+        let comparingItem = FilteredData.pop();
+
+
+
+        FilteredData.sort()
+
+        for(let item of FilteredData){
+
+
+
+                groupedData.push(item);
+                FilteredData.slice(FilteredData.indexOf(item)); // delete that item form FileteredData
+        }
+
+
+
+
+
+        return groupedDatas;
+    }
+
+
+    public helperFunctionApply(GroupedData:Responsedata[][] , apply:Apply):number[]{
+
+        return []; //stub
+    }
+
 }
