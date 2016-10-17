@@ -23,6 +23,7 @@ export class ClassInformation {
     courses_pass:number;
     courses_fail:number;
     courses_audit:number;
+    courses_uuid:string;
 
     constructor(){
         this.courses_dept = null;
@@ -33,6 +34,7 @@ export class ClassInformation {
         this.courses_pass = null;
         this.courses_fail = null;
         this.courses_audit = null;
+        this.courses_uuid = null;
     }
 
     setCourse_dept(dept:string){this.courses_dept = dept};
@@ -43,6 +45,7 @@ export class ClassInformation {
     setCourse_pass(p:number){this.courses_pass = p};
     setCourse_fail(f:number){this.courses_fail = f};
     setCourse_audit(a:number){this.courses_audit = a};
+    setCourse_uuid(i:string){this.courses_uuid = i};
 
     getCourse_dept(){return this.courses_dept};
     getCourse_id(){return this.courses_id};
@@ -52,6 +55,7 @@ export class ClassInformation {
     getCourse_pass(){ return this.courses_pass};
     getCourse_fail(){ return this.courses_fail};
     getCourse_audit(){ return this.courses_audit};
+    getCourse_uuid(){ return this.courses_uuid};
 
     getbykey(s:string):string|number{
         switch(s){
@@ -63,6 +67,7 @@ export class ClassInformation {
             case "courses_pass":  return this.courses_pass;
             case "courses_fail":  return this.courses_fail;
             case "courses_audit": return this.courses_audit;
+            case "courses_uuid": return this.courses_uuid;
         }
     }
 }
@@ -167,7 +172,7 @@ export default class DatasetController {
                                  b.setCourse_pass(a[i].Pass);
                                  b.setCourse_fail(a[i].Fail);
                                  b.setCourse_audit(a[i].Audit);
-
+                                 b.setCourse_uuid(a[i].id);
                                  processedDataset.push(b);
                              }
                          }

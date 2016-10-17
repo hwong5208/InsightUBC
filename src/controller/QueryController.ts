@@ -34,9 +34,9 @@ export interface Filter {   //added
 }
 
 export interface Apply {     //added D2
-    MAX?:Mcomparator;
-    MIN?:Mcomparator;
-    AVG?: Mcomparator;
+    MAX?:number;
+    MIN?:number;
+    AVG?: number;
     COUNT?:number;
 }
 
