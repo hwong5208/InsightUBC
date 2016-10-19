@@ -7,6 +7,7 @@ import Log from "../Util";
 import {App} from "../App";
 
 
+
 export interface Map{
     [key:string]:Array<Responsedata>;
 }
@@ -15,7 +16,7 @@ export interface QueryRequest {
     WHERE:  Filter| {}; // <- "{}" should all row should return
     GROUP?:string[];            //d2 added
     APPLY?:Apply[];               //d2 added
-    ORDER: string
+    ORDER: string|Order;
     AS: string;
 }
 
@@ -49,8 +50,8 @@ export interface ApplyToken{
 
 }
 export  interface Order {
-    UP?: string;
-    DOWN?:string;
+    dir?: string;
+    keys?: string[];
 }
 
 export interface Responsedata {   //added
@@ -134,8 +135,10 @@ export default class QueryController {
         }
         let groupedResult = this.helperFunctionGroup(result,query.GROUP);
 
+        let AppliedResult = this.helperFunctionApply(groupedResult,query.APPLY);
+
         let finalResult = new Array<Responsedata>();
-        for (let data of result){
+        for (let data of AppliedResult ){
             let r: Responsedata = {};
 
             for (let a of query.GET){
@@ -148,19 +151,26 @@ export default class QueryController {
 
 
         if(query.ORDER != undefined){
-            finalResult.sort(sortbyorder(query.ORDER)); //sort the finalResult
 
-            function sortbyorder(queryorder:string) {
-                let sortOrder = 1;
-
-                return function (a:Responsedata, b:Responsedata) {
-                    if(a[queryorder] < b[queryorder])
-                        return -1;
-                    if(a[queryorder] == b[queryorder])
-                        return 0;
-                    return 1;
-                }
+            if(typeof query.ORDER == "string" ) {
+                finalResult.sort(sortbyorder([<string>query.ORDER])); //sort the finalResult
+            }else {
+                finalResult.sort(sortbyorder((<Order>query.ORDER).keys));
             }
+
+                function sortbyorder(queryorder: string[]) {
+
+                    return function (a: Responsedata, b: Responsedata) {
+                        for(let q of queryorder) {
+                            if (a[q] < b[q])
+                                return -1;
+                            if (a[q] > b[q])
+                                return 1;
+                        }
+                        return 0;
+                    }
+                }
+
         }
         return {render: query.AS, result: finalResult};  //render the finalResult according to AS
         //return {status: 'received', ts: new Date().getTime()};
@@ -257,9 +267,76 @@ export default class QueryController {
     }
 
 
-    public helperFunctionApply(GroupedData:Responsedata[][] , apply:Apply):number[]{
+    public helperFunctionApply(GroupedData:Map, applys:Apply[]){
 
-        return []; //stub
+        let result = new Array;
+        for(let key in GroupedData){
+         result.push(    this.helperFunctionApplytoken(GroupedData[key],applys));
+        }
+       return result;
     }
+
+    public helperFunctionApplytoken(GroupedData:Responsedata[],applys:Apply[]) {
+        let result = GroupedData[0];
+
+        for(let apply of applys ) {
+            let a = Object.keys(apply)[0];
+            let token = apply[a];
+            if (token.AVG != undefined) {
+
+                let sum = 0;
+                for (let data of GroupedData) {
+                    sum = sum + <number>data[token.AVG];
+                }
+                let avg = +(sum / GroupedData.length).toFixed(2);
+                result[a]= avg;
+                continue;
+            }
+            if (token.MAX != undefined){
+
+                let max = 0;
+                for(let data of GroupedData ){
+                    if( <number>data[token.MAX]> max){
+                        max =  <number>data[token.MAX]; }
+
+                }
+                result[a]= max;
+                continue;
+            }
+
+            if (token.MIN != undefined){
+
+                let min = Number.MAX_VALUE;
+                for(let data of GroupedData ){
+                    if( <number>data[token.MIN]< min){
+                        min =  <number>data[token.MAX]; }
+
+                }
+                result[a]= min;
+                continue;
+            }
+
+            if (token.COUNT != undefined){
+                let map:Map = {};
+
+                let count = 0;
+                for(let data of GroupedData ){
+                    if (map[data[token.COUNT]]== undefined){
+                        count++
+                        map[data[token.COUNT]]=[];
+                    }
+                }
+                result[a]= count;
+                continue;
+            }
+
+
+        }
+        return result;
+    }
+
+
+
+
 
 }
