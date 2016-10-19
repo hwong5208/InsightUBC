@@ -25,6 +25,7 @@ export class ClassInformation {
     courses_audit:number;
     courses_uuid:string;
 
+
     constructor(){
         this.courses_dept = null;
         this.courses_id = null;

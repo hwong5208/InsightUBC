@@ -6,11 +6,15 @@ import {Datasets, ClassInformation} from "./DatasetController";
 import Log from "../Util";
 import {App} from "../App";
 
+
+export interface Map{
+    [key:string]:Array<Responsedata>;
+}
 export interface QueryRequest {
     GET: string[];
     WHERE:  Filter| {}; // <- "{}" should all row should return
     GROUP?:string[];            //d2 added
-    APPLY?:Apply;               //d2 added
+    APPLY?:Apply[];               //d2 added
     ORDER: string
     AS: string;
 }
@@ -34,12 +38,16 @@ export interface Filter {   //added
 }
 
 export interface Apply {     //added D2
-    MAX?:number;
-    MIN?:number;
-    AVG?: number;
-    COUNT?:number;
+    [key: string]:ApplyToken ;
 }
 
+export interface ApplyToken{
+    MAX?:string;
+    MIN?:string;
+    AVG?: string;
+    COUNT?:string;
+
+}
 export  interface Order {
     UP?: string;
     DOWN?:string;
@@ -54,6 +62,7 @@ export interface Responsedata {   //added
     courses_pass?:number;
     courses_fail?:number;
     courses_audit?:number;
+    courses_uuid?:string;
     [key: string]:string|number;
 
 }
@@ -70,11 +79,11 @@ export default class QueryController {
 
     public isValid(query: QueryRequest): boolean {
         if (typeof query !== 'undefined' && query !== null && Object.keys(query).length > 0 && query.AS != undefined && query.GET != undefined && query.WHERE != undefined){
-            if (query.ORDER != undefined){
-                if (query.GET.indexOf(query.ORDER) == -1){  //indexOf() returns the position of the first occurence of
-                    return false;                           //a specified value in a string
-                }                                           //indexOf()check if the string in ORDER is in GET
-            }                                               //it will return -1 if the string in ORDER is not in GET
+           // if (query.ORDER != undefined){
+           //     if (query.GET.indexOf(query.ORDER) == -1){  //indexOf() returns the position of the first occurence of
+           //         return false;                           //a specified value in a string
+           //     }                                           //indexOf()check if the string in ORDER is in GET
+          //  }                                               //it will return -1 if the string in ORDER is not in GET
             return true;
         }
         return false;
@@ -86,41 +95,56 @@ export default class QueryController {
 
         // return 424 if the query failed
         let id = query.GET[0].split("_")[0];  //e.g. courses_dept -> id = courses, key = dept
-        let idarray:any[] = [];
-        for(let item of query.GET) {
-            if (this.datasets[id] == undefined) {
-                idarray.push(id);
-            }
-        }
-        if(idarray.length > 0){
-            return idarray;
-        }
+        // let idarray:any[] = [];
+        // for(let item of query.GET) {
+        //     if (this.datasets[id] == undefined) {
+        //         idarray.push(id);
+        //     }
+        // }
+        // if(idarray.length > 0){
+        //     return idarray;
+        // }
 
 
         let dataset = <Array<ClassInformation>>this.datasets[id]; //get the corresponding dataset
-        let result = new Array<ClassInformation>();
+        let result = new Array<Responsedata>();
 
         try {
             for (let data of dataset) {
                 if (this.helperFunctionFilter(data, query.WHERE) == true) {
-                    result.push(data);
+
+                   let respondata: Responsedata = {};
+
+                    respondata.courses_avg = data.courses_avg;
+                    respondata.courses_dept = data.courses_dept;
+                    respondata.courses_audit = data.courses_audit;
+                    respondata.courses_fail = data.courses_fail;
+                    respondata.courses_id = data.courses_id;
+                    respondata.courses_instructor = data.courses_instructor;
+                    respondata.courses_title= data.courses_title;
+                    respondata.courses_pass = data.courses_pass;
+                    respondata.courses_uuid = data.courses_uuid;
+                    result.push(respondata);
                 }
             }
+
         }catch (err){
-            idarray.push(err.message);
-            return idarray;
+     //       idarray.push(err.message);
+            // return idarray;
         }
+        let groupedResult = this.helperFunctionGroup(result,query.GROUP);
 
         let finalResult = new Array<Responsedata>();
         for (let data of result){
             let r: Responsedata = {};
 
             for (let a of query.GET){
-               r[a] = data.getbykey(a); //get the data by key
+                r[a] = data[a]; //get the data by key
             }
             finalResult.push(r);        //finalResult is a list with only the data we want
         }
 
+//        let groupedResult = this.helperFunctionGroup(finalResult,query.GROUP);
 
 
         if(query.ORDER != undefined){
@@ -215,32 +239,21 @@ export default class QueryController {
         return true;
     }
 
-    public helperFunctionGroup(FilteredData:Responsedata[], groups:string[]): Responsedata[][]{
+    public helperFunctionGroup(FilteredData:Responsedata[], groups:string[]){
 
-        let groupedDatas = new Array;
+     let map:Map= {};
+       for (let data of FilteredData){
+           let a = "";
+           for (let group of groups){
+               a = a+ data[group];
+           }
+           if(map[a]==undefined){
+               map[a] = [];
+           }
+           map[a].push(data);
+       }
 
-        let groupedData = new Array;
-
-
-        let comparingItem = FilteredData.pop();
-
-
-
-        FilteredData.sort()
-
-        for(let item of FilteredData){
-
-
-
-                groupedData.push(item);
-                FilteredData.slice(FilteredData.indexOf(item)); // delete that item form FileteredData
-        }
-
-
-
-
-
-        return groupedDatas;
+        return map;
     }
 
 
