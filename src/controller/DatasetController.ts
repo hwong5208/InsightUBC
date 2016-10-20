@@ -173,7 +173,7 @@ export default class DatasetController {
                                  b.setCourse_pass(a[i].Pass);
                                  b.setCourse_fail(a[i].Fail);
                                  b.setCourse_audit(a[i].Audit);
-                                 b.setCourse_uuid(a[i].id);
+                                 b.setCourse_uuid(<string>a[i].id);
                                  processedDataset.push(b);
                              }
                          }

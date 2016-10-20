@@ -18,10 +18,12 @@ export default class InsightFacade implements IInsightFacade {
 
     addDataset(id: string, content: string): Promise<InsightResponse> {
        let that = this;
-       return new Promise(function (fulfill,reject) {
+       return new Promise(function (fulfill, reject) {
            that.controller.process(id, content).then(function (result:boolean) {
+
                if (result) {
                    //result -> fulfill(true)
+
                    fulfill({code:204,body: {success:result}});
                   // res.json(204, {success: result});  //id was new
 
@@ -35,7 +37,7 @@ export default class InsightFacade implements IInsightFacade {
            }).catch(function (err: Error) {
                Log.trace('RouteHandler::postDataset(..) - ERROR: ' + err.message);
               // res.json(400, {error: err.message});
-               reject({code:400,body: {error:" put error 400"}});
+               reject({code:400, body: {error:" put error 400"}});
            });
 
            return undefined;

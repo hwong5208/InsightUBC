@@ -13,10 +13,11 @@ export interface Map{
 }
 export interface QueryRequest {
     GET: string[];
-    WHERE:  Filter| {}; // <- "{}" should all row should return
+    WHERE: Filter; // <- "{}" should all row should return
     GROUP?:string[];            //d2 added
     APPLY?:Apply[];               //d2 added
-    ORDER: string|Order;
+   // ORDER: string|Order;
+    ORDER: string|AdvancedOrder;
     AS: string;
 }
 
@@ -49,8 +50,8 @@ export interface ApplyToken{
     COUNT?:string;
 
 }
-export  interface Order {
-    dir?: string;
+export interface AdvancedOrder {
+    dir?: "UP" | "DOWN";
     keys?: string[];
 }
 
@@ -153,12 +154,17 @@ export default class QueryController {
         if(query.ORDER != undefined){
 
             if(typeof query.ORDER == "string" ) {
-                finalResult.sort(sortbyorder([<string>query.ORDER])); //sort the finalResult
+                finalResult.sort(sortbyorderUp([<string>query.ORDER])); //sort the finalResult
             }else {
-                finalResult.sort(sortbyorder((<Order>query.ORDER).keys));
+
+                if((<AdvancedOrder>query.ORDER).dir == "DOWN"){
+                    finalResult.sort(sortbyorderDown((<AdvancedOrder>query.ORDER).keys))
+                }else {finalResult.sort(sortbyorderUp((<AdvancedOrder>query.ORDER).keys));}
+
+
             }
 
-                function sortbyorder(queryorder: string[]) {
+                function sortbyorderUp(queryorder: string[]) {
 
                     return function (a: Responsedata, b: Responsedata) {
                         for(let q of queryorder) {
@@ -170,6 +176,20 @@ export default class QueryController {
                         return 0;
                     }
                 }
+
+            function sortbyorderDown(queryorder: string[]) {
+
+                return function (a: Responsedata, b: Responsedata) {
+                    for(let q of queryorder) {
+                        if (a[q] < b[q])
+                            return 1;
+                        if (a[q] > b[q])
+                            return -1;
+                    }
+                    return 0;
+                }
+            }
+
 
         }
         return {render: query.AS, result: finalResult};  //render the finalResult according to AS
