@@ -161,7 +161,6 @@ export default class QueryController {
                     finalResult.sort(sortbyorderDown((<AdvancedOrder>query.ORDER).keys))
                 }else {finalResult.sort(sortbyorderUp((<AdvancedOrder>query.ORDER).keys));}
 
-
             }
 
                 function sortbyorderUp(queryorder: string[]) {
@@ -329,7 +328,7 @@ export default class QueryController {
                 let min = Number.MAX_VALUE;
                 for(let data of GroupedData ){
                     if( <number>data[token.MIN]< min){
-                        min =  <number>data[token.MAX]; }
+                        min =  <number>data[token.MIN]; }
 
                 }
                 result[a]= min;
