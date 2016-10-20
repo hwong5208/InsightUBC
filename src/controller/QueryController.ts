@@ -17,7 +17,7 @@ export interface QueryRequest {
     GROUP?:string[];            //d2 added
     APPLY?:Apply[];               //d2 added
    // ORDER: string|Order;
-    ORDER: string|AdvancedOrder;
+    ORDER?: string|AdvancedOrder;
     AS: string;
 }
 
@@ -80,69 +80,73 @@ export default class QueryController {
         this.datasets = datasets;
     }
 
-    // public isValid(query: QueryRequest): boolean {
-    //     if (typeof query !== 'undefined' && query !== null && Object.keys(query).length > 0 && query.AS != undefined && query.GET != undefined && query.WHERE != undefined){
-    //        // if (query.ORDER != undefined){
-    //        //     if (query.GET.indexOf(query.ORDER) == -1){  //indexOf() returns the position of the first occurence of
-    //        //         return false;                           //a specified value in a string
-    //        //     }                                           //indexOf()check if the string in ORDER is in GET
-    //       //  }                                               //it will return -1 if the string in ORDER is not in GET
-    //         return true;
-    //     }
-    //     return false;
-    // }
 
     public isValid(query: QueryRequest): boolean {
         if (typeof query !== 'undefined' && query !== null && Object.keys(query).length > 0 && query.AS != undefined && query.GET != undefined && query.WHERE != undefined){
-            if (query.GROUP != undefined){
-                if (query.GROUP.length <= 0){  //Empty GROUP should not be valid
+
+        if(( query.GROUP != undefined && query.APPLY == undefined)||(query.GROUP == undefined && query.APPLY != undefined)) {
+          return false;
+        }
+            if (query.GROUP != undefined && query.APPLY != undefined){
+                //Empty GROUP should not be valid
+                if (query.GROUP.length <= 0){
                     return false;
                 }
+                //All keys in GROUP should be presented in GET
                 for (let i of query.GROUP){
                     if (query.GET.indexOf(i) == -1){  //All keys in GROUP should be presented in GET
                         return false;
                     }
                 }
+
+                let applyArray = new Array;
+
+                for(let apply of query.APPLY){
+                    if(Object.keys(apply).includes("_")){return false}
+                    applyArray.push(Object.keys(apply));
+                }
+                let map:Map = {};
+                for( let group of query.GROUP){
+                    if(!group.includes("_")){return false}
+                    map[group] = [];
+                }
+                for( let apply of applyArray ){
+                    if(map[apply]== undefined){
+                        map[apply]= [];
+                    }else{return false;}
+                }
+
+                //check all keys in GET should be in either GROUP or APPLY
+                for(let get of query.GET){
+                    if(map[get]==undefined){
+                        return false;
+                    }
+                }
+
+
             }
 
-            let applyArray = new Array;
+            if (query.ORDER != undefined){
+                if(typeof query.ORDER =="string"){
+                    if(query.GET.indexOf(<string>query.ORDER)==-1) {
+                        return false;
+                    }
 
-            for(let apply of query.APPLY){
-                applyArray.push(Object.keys(apply));
+                }else{
+                    for(let key of (<AdvancedOrder>query.ORDER).keys){
+                        if(query.GET.indexOf(key)==-1) {
+                            return false;
+                        }
+                    }
+
+                }
+
             }
-            let map:Map = {};
-            for( let group of query.GROUP){
-                map[group] = [];
-            }
-            for( let apply of applyArray ){
-                if(map[apply]== undefined){
-                    map[apply]= [];
-                }else{return false;}
-            }
+
+            // checked all
 
 
-            // for (let i of query.GET){   //All keys in GET should be in either GROUP or APPLY
-            //     if (query.GROUP.indexOf(i) == -1){
-            //         if (query.APPLY.includes(i) == -1){
-            //             return false;
-            //         }
-            //
-            //     }
-            // }
 
-            // for (let i of query.GET){
-            //     if ((query.GROUP.indexOf(i) == true) && (query.APPLY.indexOf(i) == true)){
-            //
-            //     }
-            //
-            // }
-
-
-            // if (query.ORDER != undefined){
-            //     if (query.GET.indexOf(query.ORDER) == -1){  //indexOf() returns the position of the first occurence of
-            //         return false;                           //a specified value in a string
-            //     }                                           //indexOf()check if the string in ORDER is in GET
-            // }                                               //it will return -1 if the string in ORDER is not in GET
             return true;
         }
         return false;
@@ -155,15 +159,18 @@ export default class QueryController {
 
         // return 424 if the query failed
         let id = query.GET[0].split("_")[0];  //e.g. courses_dept -> id = courses, key = dept
-        // let idarray:any[] = [];
-        // for(let item of query.GET) {
-        //     if (this.datasets[id] == undefined) {
-        //         idarray.push(id);
-        //     }
-        // }
-        // if(idarray.length > 0){
-        //     return idarray;
-        // }
+         let idarray:any[] = [];
+         for(let item of query.GET) {
+                if(item.lastIndexOf("_")!=-1) {
+                    let a = item.split("_")[0];
+                    if (this.datasets[a] == undefined) {
+                        idarray.push(a);
+                    }
+                }
+         }
+         if(idarray.length > 0){
+             return idarray;
+         }
 
 
         let dataset = <Array<ClassInformation>>this.datasets[id]; //get the corresponding dataset
@@ -192,12 +199,14 @@ export default class QueryController {
      //       idarray.push(err.message);
             // return idarray;
         }
-        let groupedResult = this.helperFunctionGroup(result,query.GROUP);
+        if(query.GROUP!=undefined && query.APPLY!= undefined) {
+            let groupedResult = this.helperFunctionGroup(result, query.GROUP);
 
-        let AppliedResult = this.helperFunctionApply(groupedResult,query.APPLY);
-
+             result = this.helperFunctionApply(groupedResult, query.APPLY);
+        }
         let finalResult = new Array<Responsedata>();
-        for (let data of AppliedResult ){
+
+        for (let data of result ){
             let r: Responsedata = {};
 
             for (let a of query.GET){
@@ -416,6 +425,7 @@ export default class QueryController {
         }
         return result;
     }
+
 
 
 

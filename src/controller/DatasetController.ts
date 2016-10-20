@@ -98,6 +98,7 @@ export default class DatasetController {
             if (err) {
                 return null;
             }
+            this.datasets[id]= data;
             return data;
         });
     }
