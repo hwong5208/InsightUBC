@@ -51,7 +51,8 @@ export interface ApplyToken{
 
 }
 export interface AdvancedOrder {
-    dir?: "UP" | "DOWN";
+   // dir?: "UP" | "DOWN";
+    dir?: string;
     keys?: string[];
 }
 
@@ -79,17 +80,74 @@ export default class QueryController {
         this.datasets = datasets;
     }
 
+    // public isValid(query: QueryRequest): boolean {
+    //     if (typeof query !== 'undefined' && query !== null && Object.keys(query).length > 0 && query.AS != undefined && query.GET != undefined && query.WHERE != undefined){
+    //        // if (query.ORDER != undefined){
+    //        //     if (query.GET.indexOf(query.ORDER) == -1){  //indexOf() returns the position of the first occurence of
+    //        //         return false;                           //a specified value in a string
+    //        //     }                                           //indexOf()check if the string in ORDER is in GET
+    //       //  }                                               //it will return -1 if the string in ORDER is not in GET
+    //         return true;
+    //     }
+    //     return false;
+    // }
+
     public isValid(query: QueryRequest): boolean {
         if (typeof query !== 'undefined' && query !== null && Object.keys(query).length > 0 && query.AS != undefined && query.GET != undefined && query.WHERE != undefined){
-           // if (query.ORDER != undefined){
-           //     if (query.GET.indexOf(query.ORDER) == -1){  //indexOf() returns the position of the first occurence of
-           //         return false;                           //a specified value in a string
-           //     }                                           //indexOf()check if the string in ORDER is in GET
-          //  }                                               //it will return -1 if the string in ORDER is not in GET
+            if (query.GROUP != undefined){
+                if (query.GROUP.length <= 0){  //Empty GROUP should not be valid
+                    return false;
+                }
+                for (let i of query.GROUP){
+                    if (query.GET.indexOf(i) == -1){  //All keys in GROUP should be presented in GET
+                        return false;
+                    }
+                }
+            }
+
+            let applyArray = new Array;
+
+            for(let apply of query.APPLY){
+                applyArray.push(Object.keys(apply));
+            }
+            let map:Map = {};
+            for( let group of query.GROUP){
+                map[group] = [];
+            }
+            for( let apply of applyArray ){
+                if(map[apply]== undefined){
+                    map[apply]= [];
+                }else{return false;}
+            }
+
+
+            // for (let i of query.GET){   //All keys in GET should be in either GROUP or APPLY
+            //     if (query.GROUP.indexOf(i) == -1){
+            //         if (query.APPLY.includes(i) == -1){
+            //             return false;
+            //         }
+            //
+            //     }
+            // }
+
+            // for (let i of query.GET){
+            //     if ((query.GROUP.indexOf(i) == true) && (query.APPLY.indexOf(i) == true)){
+            //
+            //     }
+            //
+            // }
+
+
+            // if (query.ORDER != undefined){
+            //     if (query.GET.indexOf(query.ORDER) == -1){  //indexOf() returns the position of the first occurence of
+            //         return false;                           //a specified value in a string
+            //     }                                           //indexOf()check if the string in ORDER is in GET
+            // }                                               //it will return -1 if the string in ORDER is not in GET
             return true;
         }
         return false;
     }
+
 
     public query(query: QueryRequest): QueryResponse {
         Log.trace('QueryController::query( ' + JSON.stringify(query) + ' )');
@@ -153,15 +211,20 @@ export default class QueryController {
 
         if(query.ORDER != undefined){
 
+
             if(typeof query.ORDER == "string" ) {
                 finalResult.sort(sortbyorderUp([<string>query.ORDER])); //sort the finalResult
             }else {
 
-                if((<AdvancedOrder>query.ORDER).dir == "DOWN"){
+                if ((<AdvancedOrder>query.ORDER).dir == "DOWN") {
                     finalResult.sort(sortbyorderDown((<AdvancedOrder>query.ORDER).keys))
-                }else {finalResult.sort(sortbyorderUp((<AdvancedOrder>query.ORDER).keys));}
-
+                } else {
+                    finalResult.sort(sortbyorderUp((<AdvancedOrder>query.ORDER).keys));
+                }
             }
+
+
+
 
                 function sortbyorderUp(queryorder: string[]) {
 
