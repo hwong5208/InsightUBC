@@ -19,7 +19,7 @@ describe("QueryController", function () {
     afterEach(function () {
     });
 
-    it("Should be able to validate a valid query", function () {
+    it("Should be able to validate a valid query: D1", function () {
         // NOTE: this is not actually a valid query for D1
         let query: QueryRequest = {
             "GET": ["courses_dept", "courses_avg"],
@@ -33,6 +33,26 @@ describe("QueryController", function () {
 
         expect(isValid).to.equal(true);
     });
+
+
+    it("Should be able to validate a valid query: D2", function () {
+        // NOTE: this is not actually a valid query for D1
+        let query: QueryRequest = {
+            "GET": ["courses_id", "courseAverage"],
+            "WHERE": {"IS": {"courses_dept": "cpsc"}} ,
+            "GROUP": [ "courses_id" ],
+            "APPLY": [ {"courseAverage": {"AVG": "courses_avg"}} ],
+            "ORDER": { "dir": "UP", "keys": ["courseAverage", "courses_id"]},
+            "AS":"TABLE"
+        };
+        let dataset: Datasets = {};
+        let controller = new QueryController(dataset);
+        let isValid = controller.isValid(query);
+
+        expect(isValid).to.equal(true);
+    });
+
+
 
     it("Should be able to invalidate an invalid query", function () {
         let query: any = null;
