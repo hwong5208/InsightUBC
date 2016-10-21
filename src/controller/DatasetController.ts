@@ -24,7 +24,7 @@ export class ClassInformation {
     courses_fail:number;
     courses_audit:number;
     courses_uuid:string;
-
+   [key:string]:any;
 
     constructor(){
         this.courses_dept = null;
@@ -58,7 +58,7 @@ export class ClassInformation {
     getCourse_audit(){ return this.courses_audit};
     getCourse_uuid(){ return this.courses_uuid};
 
-    getbykey(s:string):string|number{
+    public  getbykey(s:string):string|number{
         switch(s){
             case "courses_dept": return this.courses_dept;
             case "courses_id": return this.courses_id;
@@ -78,6 +78,7 @@ export default class DatasetController {
     private datasets: Datasets = {};
 
     constructor() {
+        this.getDatasets();
         Log.trace('DatasetController::init()');
     }
     /**
@@ -91,7 +92,7 @@ export default class DatasetController {
     public getDataset(id: string): any {
         // TODO: this should check if the dataset is on disk in ./data if it is not already in memory.
 
-        if (this.datasets.hasOwnProperty(id)){
+        if (this.datasets[id]!=undefined){
             return this.datasets[id];
         }
         fs.readFile("./data/"+id, function read(err, data) {  // read from disk
@@ -111,15 +112,19 @@ export default class DatasetController {
 
     public getDatasets(): Datasets {
         // TODO: if datasets is empty, load all dataset files in ./data from disk
-        if (Object.keys(this.datasets).length === 0){  //if datasets does not have any keys, it is empty
-            let fileNames = fs.readdirSync('./data');  //returns an array of file names
-            for (let f of fileNames){
-                let data = fs.readFileSync('./data/'+f,'utf-8');  //returns contents of file
-                //console.log(data);
-                let id = f.substring(0,f.lastIndexOf('.'));
-                this.datasets[id]=JSON.parse(data);
-            }
-        }
+     try {
+         if (Object.keys(this.datasets).length === 0) {  //if datasets does not have any keys, it is empty
+             let fileNames = fs.readdirSync('./data');  //returns an array of file names
+             for (let f of fileNames) {
+                 let data = fs.readFileSync('./data/' + f, 'utf-8');  //returns contents of file
+                 //console.log(data);
+                 let id = f;
+                 this.datasets[id] = JSON.parse(data);
+             }
+         }
+     }catch(err){
+
+     }
         return this.datasets;
     }
 
@@ -208,16 +213,18 @@ export default class DatasetController {
      */
     private save(id: string, processedDataset: any) {
         // add it to the memory model
-        this.datasets[id] = processedDataset;
-        console.log("Saving processedDataset");
-        // TODO: actually write to disk in the ./data directory
-        // create the './data' folder if it doesn't exist
-        // console.log( fs.lstat('/'+id));
-        let dir = './data/';
-        if(!fs.existsSync(dir)){
-            fs.mkdirSync(dir);
-        }
-        fs.writeFile('./data/'+id,JSON.stringify(processedDataset));
+
+            this.datasets[id] = processedDataset;
+            console.log("Saving processedDataset");
+            // TODO: actually write to disk in the ./data directory
+            // create the './data' folder if it doesn't exist
+            // console.log( fs.lstat('/'+id));
+            let dir = './data/';
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir);
+            }
+            fs.writeFile('./data/' + id, JSON.stringify(processedDataset));
+
         // writeFile - asynchronously writes data to a file, replacing the file if it already exists.
     }   // stringify - Converts a JavaScript value to a JavaScript Object Notation (JSON) string.
 

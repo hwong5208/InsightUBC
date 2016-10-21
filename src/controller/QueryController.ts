@@ -197,7 +197,7 @@ export default class QueryController {
 
         }catch (err){
      //       idarray.push(err.message);
-            // return idarray;
+            console.log("catch error");
         }
         if(query.GROUP!=undefined && query.APPLY!= undefined) {
             let groupedResult = this.helperFunctionGroup(result, query.GROUP);
@@ -294,7 +294,7 @@ export default class QueryController {
                 throw new Error(id)} //check if dataset has this id
             let value = filter.GT[key];           //e.g. value = 70
 
-            if (classes.getbykey(key) > value){
+            if (classes[key] > value){
                 return true;
             } return false;
         }
@@ -306,7 +306,7 @@ export default class QueryController {
                 console.log("LT error");
                 throw new Error(id)} //check if dataset has this id
             let value = filter.LT[key];           //e.g. value = 70
-            if (classes.getbykey(key) < value){
+            if (classes[key] < value){
                 return true;
             } return false;
         }
@@ -317,11 +317,12 @@ export default class QueryController {
                 console.log("EQ error");
                 throw new Error(id)} //check if dataset has this id
             let value = filter.EQ[key];           //e.g. value = 70
-            if (classes.getbykey(key) == value){
+            if (classes[key] == value){
                 return true;
             } return false;
         }
         if (filter.IS != undefined){
+
             let key = Object.keys(filter.IS)[0];  //e.g. "courses_dept"
             let id = key.split("_")[0];           //e.g. id = "courses"
             if (this.datasets[id] == undefined){
@@ -329,7 +330,8 @@ export default class QueryController {
                 throw new Error(id)} //check if dataset has this id
             let value = filter.IS[key];           //e.g. value = "adhe"
             let reg = new RegExp("^"+(value.replace(/\*/g, ".*"))+"$"); //^ matches beginning of input, $ matches end of input
-            if (reg.test(<string>classes.getbykey(key)) ){   //cp* reg  //test() executes a search for a match between
+            let z = classes[key];
+            if (reg.test(<string>z) ){   //cp* reg  //test() executes a search for a match between
                 return true;                                            //a regular expression and a specified string
             } return false;
         }

@@ -20,13 +20,13 @@ export default class InsightFacade implements IInsightFacade {
        let that = this;
        return new Promise(function (fulfill, reject) {
            that.controller.process(id, content).then(function (result:boolean) {
-
+               console.log(result);
                if (result) {
                    //result -> fulfill(true)
 
                    fulfill({code:204,body: {success:result}});
                   // res.json(204, {success: result});  //id was new
-
+                  console.log("204");
                } else {                               //result -> fulfill(false)
                    fulfill({code:201,body: {success:result}});
                    //res.json(201, {success: result});  // id already existed
@@ -40,7 +40,7 @@ export default class InsightFacade implements IInsightFacade {
                reject({code:400, body: {error:" put error 400"}});
            });
 
-           return undefined;
+
        });
     }
 
