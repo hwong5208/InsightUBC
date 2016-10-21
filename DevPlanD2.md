@@ -1,4 +1,4 @@
-+Implement InsightFacade by refactoring the code in RouteHandler
++ Implement InsightFacade by refactoring the code in RouteHandler
 
 By Oct 14
 
