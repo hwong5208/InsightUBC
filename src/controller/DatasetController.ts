@@ -78,7 +78,7 @@ export default class DatasetController {
     private datasets: Datasets = {};
 
     constructor() {
-        this.getDatasets();
+      
         Log.trace('DatasetController::init()');
     }
     /**
