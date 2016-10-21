@@ -78,7 +78,8 @@ export default class DatasetController {
     private datasets: Datasets = {};
 
     constructor() {
-        this.getDatasets();
+
+
         Log.trace('DatasetController::init()');
     }
     /**
@@ -123,7 +124,7 @@ export default class DatasetController {
              }
          }
      }catch(err){
-
+          throw err;
      }
         return this.datasets;
     }
@@ -183,13 +184,18 @@ export default class DatasetController {
                                  processedDataset.push(b);
                              }
                          }
-                       if(that.datasets[id] == undefined){
+                         if(that.save(id,processedDataset)==204){
+                             fulfill(true);
+                         }else{
+                             fulfill(false);
+                         }
+                       /*if(that.datasets[id] == undefined){
                            that.save(id, processedDataset);
                            fulfill(true);
                        }else{
                            that.save(id, processedDataset);
                            fulfill(false);
-                       }
+                       }*/
                     }).catch(function (err) {
                         reject(err);
                     });
@@ -213,7 +219,10 @@ export default class DatasetController {
      */
     private save(id: string, processedDataset: any) {
         // add it to the memory model
-
+        let re = 204;
+            if( this.datasets[id]!=undefined){
+                re = 201;
+            }
             this.datasets[id] = processedDataset;
             console.log("Saving processedDataset");
             // TODO: actually write to disk in the ./data directory
@@ -223,8 +232,9 @@ export default class DatasetController {
             if (!fs.existsSync(dir)) {
                 fs.mkdirSync(dir);
             }
-            fs.writeFile('./data/' + id, JSON.stringify(processedDataset));
 
+            fs.writeFile('./data/' + id, JSON.stringify(processedDataset));
+         return re;
         // writeFile - asynchronously writes data to a file, replacing the file if it already exists.
     }   // stringify - Converts a JavaScript value to a JavaScript Object Notation (JSON) string.
 

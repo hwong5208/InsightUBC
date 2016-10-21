@@ -12,14 +12,16 @@ import Log from "../Util";
 import fs = require('fs');
 
 export default class InsightFacade implements IInsightFacade {
-    private controller = new DatasetController();
 
-  //  let controller = new DatasetController();
+
+    //  let controller = new DatasetController();
+    private static controller = new DatasetController();
 
     addDataset(id: string, content: string): Promise<InsightResponse> {
        let that = this;
+
        return new Promise(function (fulfill, reject) {
-           that.controller.process(id, content).then(function (result:boolean) {
+           InsightFacade.controller.process(id, content).then(function (result:boolean) {
                console.log(result);
                if (result) {
                    //result -> fulfill(true)
@@ -51,9 +53,9 @@ export default class InsightFacade implements IInsightFacade {
 
             try {
 
-                if (that.controller.getDataset(id) != undefined){
+                if (InsightFacade.controller.getDataset(id) != undefined){
                     fs.unlinkSync("./data/"+id);
-                    that.controller.deleteDataSets(id);
+                    InsightFacade.controller.deleteDataSets(id);
                     Log.trace('RouteHandler::deleteDataset(..) - processed');
                     //res.json(204, {success: 'dataset is deleted'});
                     fulfill({code:204,body: {success:'dataset is deleted'}});
@@ -78,7 +80,7 @@ export default class InsightFacade implements IInsightFacade {
         let that = this;
         return new Promise(function (fulfill,reject){
             try {
-                let datasets = that.controller.getDatasets();
+                let datasets = InsightFacade.controller.getDatasets();
                 let controller = new QueryController(datasets);
                 let isValid = controller.isValid(query);
 

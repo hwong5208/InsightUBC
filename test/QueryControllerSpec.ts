@@ -35,14 +35,14 @@ describe("QueryController", function () {
     });
 
 
-    it("Should be able to validate a valid query: D2", function () {
+    it("Should be able to validate a valid query: D2.basic", function () {
         // NOTE: this is not actually a valid query for D1
         let query: QueryRequest = {
-            "GET": ["courses_id", "courseAverage"],
-            "WHERE": {"IS": {"courses_dept": "cpsc"}} ,
-            "GROUP": [ "courses_id" ],
-            "APPLY": [ {"courseAverage": {"AVG": "courses_avg"}} ],
-            "ORDER": { "dir": "UP", "keys": ["courseAverage", "courses_id"]},
+            "GET": ["courses_dept", "courses_id", "courseAverage", "maxFail"],
+            "WHERE": {},
+            "GROUP": [ "courses_dept", "courses_id" ],
+            "APPLY": [ {"courseAverage": {"AVG": "courses_avg"}}, {"maxFail": {"MAX": "courses_fail"}} ],
+            "ORDER": { "dir": "UP", "keys": ["courseAverage", "maxFail", "courses_dept", "courses_id"]},
             "AS":"TABLE"
         };
         let dataset: Datasets = {};
