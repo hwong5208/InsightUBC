@@ -196,8 +196,8 @@ export default class QueryController {
             }
 
         }catch (err){
-     //       idarray.push(err.message);
-            console.log("catch error");
+            idarray.push(err.message);
+                    return idarray;
         }
         if(query.GROUP!=undefined && query.APPLY!= undefined) {
             let groupedResult = this.helperFunctionGroup(result, query.GROUP);
