@@ -53,6 +53,26 @@ describe("QueryController", function () {
     });
 
 
+    it("Should be able to validate a valid query: D2.basic Down", function () {
+
+        let query: QueryRequest = {
+            "GET": ["courses_dept", "courses_avg"],
+            "WHERE" : {
+                "LT" : {"courses_avg" : 90}
+            },
+            "ORDER" : "courses_avg",
+            "AS" : "TABLE"
+        };
+        let dataset: Datasets = {};
+        let controller = new QueryController(dataset);
+        let isValid = controller.isValid(query);
+
+
+        let ret = controller.query(query);
+
+        expect(ret).not.to.be.equal(null);
+    });
+
 
     it("Should be able to invalidate an invalid query", function () {
         let query: any = null;

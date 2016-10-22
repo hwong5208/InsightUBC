@@ -303,7 +303,7 @@ export default class QueryController {
             let id = key.split("_")[0];           //e.g. id = "courses"
 
             if (this.datasets[id] == undefined){
-                console.log("LT error");
+
                 throw new Error(id)} //check if dataset has this id
             let value = filter.LT[key];           //e.g. value = 70
             if (classes[key] < value){
@@ -314,7 +314,7 @@ export default class QueryController {
             let key = Object.keys(filter.EQ)[0];  //e.g. "courses_avg"
             let id = key.split("_")[0];           //e.g. id = "courses"
             if (this.datasets[id] == undefined){
-                console.log("EQ error");
+
                 throw new Error(id)} //check if dataset has this id
             let value = filter.EQ[key];           //e.g. value = 70
             if (classes[key] == value){
@@ -326,7 +326,7 @@ export default class QueryController {
             let key = Object.keys(filter.IS)[0];  //e.g. "courses_dept"
             let id = key.split("_")[0];           //e.g. id = "courses"
             if (this.datasets[id] == undefined){
-                console.log("IS error");
+
                 throw new Error(id)} //check if dataset has this id
             let value = filter.IS[key];           //e.g. value = "adhe"
             let reg = new RegExp("^"+(value.replace(/\*/g, ".*"))+"$"); //^ matches beginning of input, $ matches end of input

@@ -48,29 +48,7 @@ export class ClassInformation {
     setCourse_audit(a:number){this.courses_audit = a};
     setCourse_uuid(i:string){this.courses_uuid = i};
 
-    getCourse_dept(){return this.courses_dept};
-    getCourse_id(){return this.courses_id};
-    getCourse_avg(){return this.courses_avg};
-    getCourse_instructor(){return this.courses_instructor};
-    getCourse_title(){return this.courses_title };
-    getCourse_pass(){ return this.courses_pass};
-    getCourse_fail(){ return this.courses_fail};
-    getCourse_audit(){ return this.courses_audit};
-    getCourse_uuid(){ return this.courses_uuid};
 
-    public  getbykey(s:string):string|number{
-        switch(s){
-            case "courses_dept": return this.courses_dept;
-            case "courses_id": return this.courses_id;
-            case "courses_avg": return this.courses_avg;
-            case "courses_instructor": return this.courses_instructor;
-            case "courses_title": return this.courses_title;
-            case "courses_pass":  return this.courses_pass;
-            case "courses_fail":  return this.courses_fail;
-            case "courses_audit": return this.courses_audit;
-            case "courses_uuid": return this.courses_uuid;
-        }
-    }
 }
 
 export default class DatasetController {
@@ -89,6 +67,7 @@ export default class DatasetController {
      * @param id
      * @returns {{}}
      */
+
     public getDataset(id: string): any {
         // TODO: this should check if the dataset is on disk in ./data if it is not already in memory.
 
@@ -112,7 +91,7 @@ export default class DatasetController {
 
     public getDatasets(): Datasets {
         // TODO: if datasets is empty, load all dataset files in ./data from disk
-     try {
+
          if (Object.keys(this.datasets).length === 0) {  //if datasets does not have any keys, it is empty
              let fileNames = fs.readdirSync('./data');  //returns an array of file names
              for (let f of fileNames) {
@@ -122,9 +101,7 @@ export default class DatasetController {
                  this.datasets[id] = JSON.parse(data);
              }
          }
-     }catch(err){
 
-     }
         return this.datasets;
     }
 

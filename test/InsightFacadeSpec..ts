@@ -10,6 +10,7 @@ import Log from "../src/Util";
 import {expect} from 'chai';
 import InsightFacade from "../src/controller/InsightFacade";
 import {InsightResponse} from "../src/controller/IInsightFacade";
+import {QueryRequest} from "../src/controller/QueryController";
 
 describe("InsightFacade", function () {
 
@@ -34,7 +35,6 @@ describe("InsightFacade", function () {
         facade = new InsightFacade();
     });
 
-
     it("Should be able to add a add a new dataset (204)", function () {
         var that = this;
         Log.trace("Starting test: " + that.test.title);
@@ -43,7 +43,13 @@ describe("InsightFacade", function () {
         }).catch(function (response: InsightResponse) {
             expect.fail('Should not happen');
         });
-    });
+    })
+
+
+
+
+
+
 
 
     it("Should be able to update an existing dataset (201)", function () {
@@ -54,6 +60,166 @@ describe("InsightFacade", function () {
         }).catch(function (response: InsightResponse) {
             expect(response.code).to.equal(201);
         });
+    });
+
+    it("Should be able to validate a valid query: D2.basic Down", function () {
+
+        let query: QueryRequest = {
+            "GET": ["courses_dept", "courses_id", "courseAverage", "maxFail"],
+            "WHERE": {},
+            "GROUP": [ "courses_dept", "courses_id" ],
+            "APPLY": [ {"courseAverage": {"AVG": "courses_avg"}}, {"maxFail": {"MIN": "courses_fail"}} ],
+            "ORDER": { "dir": "DOWN", "keys": ["courseAverage", "maxFail", "courses_dept", "courses_id"]},
+            "AS":"TABLE"
+        };
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect(response.code).to.equal(200);
+        }).catch(function (response: InsightResponse) {
+            expect.fail();
+        });
+
+    });
+
+    it("Should be able to validate a valid query: D2.basic Down", function () {
+
+        let query: QueryRequest =  {
+            "GET": ["courses_dept", "courses_avg"],
+            "WHERE": {"LT": {"courses_avg": 70}},
+            "ORDER": "courses_avg",
+            "AS": "TABLE"
+        };
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect(response.code).to.equal(200);
+        }).catch(function (response: InsightResponse) {
+            expect.fail();
+        });
+
+    });
+
+
+    it("Should be able to validate a valid query: D2.basic Down", function () {
+
+        let query: QueryRequest =  {
+            "GET": ["courses_dept", "courses_avg"],
+            "WHERE": {"LT": {"cous_avg": 70}},
+            "ORDER": "courses_avg",
+            "AS": "TABLE"
+        };
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect.fail();
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(424);
+        });
+
+    });
+
+
+    it("Should be able to validate a valid query: D2.basic Down", function () {
+
+        let query: QueryRequest =  {
+            "GET": ["courses_dept", "courses_avg"],
+            "WHERE": {"LT": {"cous_avg": 70}},
+            "ORDER": "courses_avg",
+            "AS": "TABLE"
+        };
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect.fail();
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(424);
+        });
+
+    });
+
+
+    it("Should be able to validate a valid query: D2.basic Down", function () {
+
+        let query: QueryRequest =  {
+            "GET": ["courses_dept", "courses_id", "courseAverage", "maxFail"],
+            "WHERE": {},
+
+            "APPLY": [ {"courseAverage": {"AVG": "courses_avg"}}, {"maxFail": {"MIN": "courses_fail"}} ],
+            "ORDER": { "dir": "DOWN", "keys": ["courseAverage", "maxFail", "courses_dept", "courses_id"]},
+            "AS":"TABLE"
+        };
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect.fail();
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(400);
+        });
+
+    });
+    it("Should be able to validate a valid query: D2.basic Down", function () {
+
+        let query: QueryRequest =  {
+            "GET": ["courses_dept", "courses_id", "courseAverage", "maxFail"],
+            "WHERE": {},
+            "GROUP": [ "courses_xxx", "courses_id" ],
+            "APPLY": [ {"courseAverage": {"AVG": "courses_avg"}}, {"maxFail": {"MIN": "courses_fail"}} ],
+            "ORDER": { "dir": "DOWN", "keys": ["courseAverage", "maxFail", "courses_dept", "courses_id"]},
+            "AS":"TABLE"
+        };
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect.fail();
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(400);
+        });
+
+    });
+
+
+    it("Should be able to validate a valid query: D2.basic Down", function () {
+
+        let query: QueryRequest =  {
+            "GET": ["courses_dept", "courses_id", "courseAverage", "maxFail"],
+            "WHERE": {},
+            "GROUP": [ "courses_dept", "courses_id" ],
+            "APPLY": [ {"course_Average": {"AVG": "courses_avg"}}, {"maxFail": {"MIN": "courses_fail"}} ],
+            "ORDER": { "dir": "DOWN", "keys": ["courseAverage", "maxFail", "courses_dept", "courses_id"]},
+            "AS":"TABLE"
+        };
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect.fail();
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(400);
+        });
+
+    });
+
+
+    it("Should be able to validate a valid query: D2.basic Down", function () {
+
+        let query: QueryRequest =  {
+            "GET": ["coursesdept", "courses_id", "courseAverage", "maxFail"],
+            "WHERE": {},
+            "GROUP": [ "coursesdept", "courses_id" ],
+            "APPLY": [ {"courseAverage": {"AVG": "courses_avg"}}, {"maxFail": {"MIN": "courses_fail"}} ],
+            "ORDER": { "dir": "DOWN", "keys": ["courseAverage", "maxFail", "courses_dept", "courses_id"]},
+            "AS":"TABLE"
+        };
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect.fail();
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(400);
+        });
+
+    });
+
+    it("Should be able to validate a valid query: D2.basic Down", function () {
+
+        let query: QueryRequest =  {
+            "GET": ["courses_dept", "courses_id", "maxFail"],
+            "WHERE": {},
+            "GROUP": [ "courses_dept", "courses_id" ],
+            "APPLY": [ {"maxFail": {"AVG": "courses_avg"}}, {"maxFail": {"MIN": "courses_fail"}} ],
+            "ORDER": { "dir": "DOWN", "keys": ["courseAverage", "maxFail", "courses_dept", "courses_id"]},
+            "AS":"TABLE"
+        };
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect.fail();
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(400);
+        });
+
     });
 
     it("Should not be able to add an invalid dataset (400)", function () {
@@ -84,8 +250,13 @@ describe("InsightFacade", function () {
             expect(response.code).to.equal(204);
         }).catch(function (response: InsightResponse) {
             expect(response.code).to.equal(404);
+
         });
+
     });
+
+
+
 
     it("Should not be able to removeDataset (404)", function () {
         var that = this;
@@ -96,6 +267,8 @@ describe("InsightFacade", function () {
             expect(response.code).to.equal(404);
         });
     });
+
+
 
 
 

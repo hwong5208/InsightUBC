@@ -7,6 +7,7 @@
 
 import DatasetController from "../src/controller/DatasetController";
 import Log from "../src/Util";
+import fs = require('fs');
 
 import JSZip = require('jszip');
 import {expect} from 'chai';
@@ -40,5 +41,7 @@ describe("DatasetController", function () {
         });
 
     });
+
+
 
 });
