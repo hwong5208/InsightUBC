@@ -43,14 +43,7 @@ describe("InsightFacade", function () {
         }).catch(function (response: InsightResponse) {
             expect.fail('Should not happen');
         });
-    })
-
-
-
-
-
-
-
+    });
 
     it("Should be able to update an existing dataset (201)", function () {
         var that = this;
@@ -62,7 +55,7 @@ describe("InsightFacade", function () {
         });
     });
 
-    it("Should be able to validate a valid query: D2.basic Down", function () {
+    it("Should be able to validate a valid query: D2 DOWN MIN", function () {
 
         let query: QueryRequest = {
             "GET": ["courses_dept", "courses_id", "courseAverage", "maxFail"],
@@ -80,7 +73,7 @@ describe("InsightFacade", function () {
 
     });
 
-    it("Should be able to validate a valid query: D2.basic Down", function () {
+    it("Should be able to validate a valid query: D1", function () {
 
         let query: QueryRequest =  {
             "GET": ["courses_dept", "courses_avg"],
@@ -96,8 +89,108 @@ describe("InsightFacade", function () {
 
     });
 
+    it("Should be able to validate a valid query: D1", function () {
 
-    it("Should be able to validate a valid query: D2.basic Down", function () {
+        let query: QueryRequest =  {
+            "GET": ["courses_dept", "courses_id", "courses_avg"],
+            "WHERE": {
+                "OR": [
+                    {"AND": [
+                        {"GT": {"courses_avg": 70}},
+                        {"IS": {"courses_dept": "adhe"}}
+                    ]},
+                    {"EQ": {"courses_avg": 90}}
+                ]
+            },
+            "ORDER": "courses_avg",
+            "AS": "TABLE"
+
+        };
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect(response.code).to.equal(200);
+        }).catch(function (response: InsightResponse) {
+            expect.fail();
+        });
+
+    });
+
+    it("Should be able to invalidate an invalid query: D1 Not valid id GT ", function () {
+
+        let query: QueryRequest =  {
+            "GET": ["courses_dept", "courses_id", "courses_avg"],
+            "WHERE": {
+                "OR": [
+                    {"AND": [
+                        {"GT": {"cour_avg": 70}},
+                        {"IS": {"courses_dept": "adhe"}}
+                    ]},
+                    {"EQ": {"courses_avg": 90}}
+                ]
+            },
+            "ORDER": "courses_avg",
+            "AS": "TABLE"
+
+        };
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect.fail();
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(424);
+        });
+
+    });
+
+    it("Should be able to invalidate an invalid query: D1 Not valid id EQ", function () {
+
+        let query: QueryRequest =  {
+            "GET": ["courses_dept", "courses_id", "courses_avg"],
+            "WHERE": {
+                "OR": [
+                    {"AND": [
+                        {"GT": {"courses_avg": 70}},
+                        {"IS": {"courses_dept": "adhe"}}
+                    ]},
+                    {"EQ": {"cour_avg": 90}}
+                ]
+            },
+            "ORDER": "courses_avg",
+            "AS": "TABLE"
+
+        };
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect.fail();
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(424);
+        });
+
+    });
+
+    it("Should be able to invalidate an invalid query: D1 Not valid id IS", function () {
+
+        let query: QueryRequest =  {
+            "GET": ["courses_dept", "courses_id", "courses_avg"],
+            "WHERE": {
+                "OR": [
+                    {"AND": [
+                        {"GT": {"courses_avg": 70}},
+                        {"IS": {"cour_dept": "adhe"}}
+                    ]},
+                    {"EQ": {"courses_avg": 90}}
+                ]
+            },
+            "ORDER": "courses_avg",
+            "AS": "TABLE"
+
+        };
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect.fail();
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(424);
+        });
+
+    });
+
+
+    it("Should be able to invalidate an invalid query: D1 Not valid id LT", function () {
 
         let query: QueryRequest =  {
             "GET": ["courses_dept", "courses_avg"],
@@ -114,10 +207,10 @@ describe("InsightFacade", function () {
     });
 
 
-    it("Should be able to validate a valid query: D2.basic Down", function () {
+    it("Should be able to validate a valid query: D1 all keys in ORDER has to be in GET", function () {
 
         let query: QueryRequest =  {
-            "GET": ["courses_dept", "courses_avg"],
+            "GET": ["courses_dept"],
             "WHERE": {"LT": {"cous_avg": 70}},
             "ORDER": "courses_avg",
             "AS": "TABLE"
@@ -131,7 +224,7 @@ describe("InsightFacade", function () {
     });
 
 
-    it("Should be able to validate a valid query: D2.basic Down", function () {
+    it("Should be able to invalidate an invalid query: D2 GROUP is missing", function () {
 
         let query: QueryRequest =  {
             "GET": ["courses_dept", "courses_id", "courseAverage", "maxFail"],
@@ -148,7 +241,9 @@ describe("InsightFacade", function () {
         });
 
     });
-    it("Should be able to validate a valid query: D2.basic Down", function () {
+
+
+    it("Should be able to invalidate an invalid query: D2 invalid key in GROUP", function () {
 
         let query: QueryRequest =  {
             "GET": ["courses_dept", "courses_id", "courseAverage", "maxFail"],
@@ -167,10 +262,10 @@ describe("InsightFacade", function () {
     });
 
 
-    it("Should be able to validate a valid query: D2.basic Down", function () {
+    it("Should be able to invalidate an invalid query: D2 APPLY's key course_Average has _", function () {
 
         let query: QueryRequest =  {
-            "GET": ["courses_dept", "courses_id", "courseAverage", "maxFail"],
+            "GET": ["courses_dept", "courses_id", "course_Average", "maxFail"],
             "WHERE": {},
             "GROUP": [ "courses_dept", "courses_id" ],
             "APPLY": [ {"course_Average": {"AVG": "courses_avg"}}, {"maxFail": {"MIN": "courses_fail"}} ],
@@ -186,7 +281,7 @@ describe("InsightFacade", function () {
     });
 
 
-    it("Should be able to validate a valid query: D2.basic Down", function () {
+    it("Should be able to invalidate an invalid query: D2 GROUP's key coursesdept does not have _", function () {
 
         let query: QueryRequest =  {
             "GET": ["coursesdept", "courses_id", "courseAverage", "maxFail"],
@@ -204,7 +299,8 @@ describe("InsightFacade", function () {
 
     });
 
-    it("Should be able to validate a valid query: D2.basic Down", function () {
+
+    it("Should be able to invalidate an invalid query: D2 APPLY is not unique", function () {
 
         let query: QueryRequest =  {
             "GET": ["courses_dept", "courses_id", "maxFail"],
@@ -222,6 +318,44 @@ describe("InsightFacade", function () {
 
     });
 
+
+    it("Should be able to invalidate an invalid query: D2 GROUP is empty", function () {
+
+        let query: QueryRequest =  {
+            "GET": ["courses_dept", "courses_id", "courseAverage", "maxFail"],
+            "WHERE": {},
+            "GROUP": [],
+            "APPLY": [ {"courseAverage": {"AVG": "courses_avg"}}, {"maxFail": {"MIN": "courses_fail"}} ],
+            "ORDER": { "dir": "DOWN", "keys": ["courseAverage", "maxFail", "courses_dept", "courses_id"]},
+            "AS":"TABLE"
+        };
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect.fail();
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(400);
+        });
+
+    });
+    /*
+     it("Should be able to invalidate an invalid query: D2 ", function () {
+
+     let query: QueryRequest =  {
+     "GET": ["courses_dept", "courses_id", "courseAverage", "maxFail"],
+     "WHERE": {},
+     "GROUP": [ "courses_dept", "courses_id" ],
+     "APPLY": [ {"courseAverage": {"AVG": "courses_avg"}}, {"maxFail": {"MIN": "courses_fail"}} ],
+     "ORDER": { "dir": "DOWN", "keys": ["courseAverage", "maxFail", "courses_dept", "courses_id"]},
+     "AS":"TABLE"
+     };
+     return facade.performQuery(query).then(function (response: InsightResponse) {
+     expect.fail();
+     }).catch(function (response: InsightResponse) {
+     expect(response.code).to.equal(400);
+     });
+
+     });
+     */
+
     it("Should not be able to add an invalid dataset (400)", function () {
         var that = this;
         Log.trace("Starting test: " + that.test.title);
@@ -231,17 +365,17 @@ describe("InsightFacade", function () {
             expect(response.code).to.equal(400);
         });
     });
-/*
-    it("Should be able to update an existing dataset (201)", function () {
-        var that = this;
-        Log.trace("Starting test: " + that.test.title);
-        return facade.addDataset('courses', zipFileContents).then(function (response: InsightResponse) {
-            expect(response.code).to.equal(201);
-        }).catch(function (response: InsightResponse) {
-            expect(response.code).to.equal(201);
-        });
-    });
-*/
+    /*
+     it("Should be able to update an existing dataset (201)", function () {
+     var that = this;
+     Log.trace("Starting test: " + that.test.title);
+     return facade.addDataset('courses', zipFileContents).then(function (response: InsightResponse) {
+     expect(response.code).to.equal(201);
+     }).catch(function (response: InsightResponse) {
+     expect(response.code).to.equal(201);
+     });
+     });
+     */
 
     it("Should be able to removeDataset (204)", function () {
         var that = this;
@@ -257,7 +391,6 @@ describe("InsightFacade", function () {
 
 
 
-
     it("Should not be able to removeDataset (404)", function () {
         var that = this;
         Log.trace("Starting test: " + that.test.title);
@@ -267,9 +400,5 @@ describe("InsightFacade", function () {
             expect(response.code).to.equal(404);
         });
     });
-
-
-
-
 
 });

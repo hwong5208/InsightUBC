@@ -68,7 +68,7 @@ export default class DatasetController {
      * @returns {{}}
      */
 
-    
+
     public getDataset(id: string): any {
         // TODO: this should check if the dataset is on disk in ./data if it is not already in memory.
 
