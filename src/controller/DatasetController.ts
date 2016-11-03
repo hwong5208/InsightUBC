@@ -5,7 +5,10 @@
 import Log from "../Util";
 import JSZip = require('jszip');
 import fs = require('fs');
-import {error} from "util";
+import parse5 = require('parse5');
+import {ASTNode} from "parse5";
+import http = require('http');
+
 /**
  * In memory representation of all datasets.
  */
@@ -24,7 +27,7 @@ export class ClassInformation {
     courses_fail:number;
     courses_audit:number;
     courses_uuid:string;
-   [key:string]:any;
+    [key:string]:any;
 
     constructor(){
         this.courses_dept = null;
@@ -51,12 +54,51 @@ export class ClassInformation {
 
 }
 
+export interface RoomInformation{
+    rooms_fullname:string;
+    rooms_shortname: string;
+    rooms_number: string;
+    rooms_name: string;
+    rooms_address: string;
+    rooms_lat: number;
+    rooms_lon: number;
+    rooms_seats: number;
+    rooms_type: string;
+    rooms_furniture: string;
+    rooms_href: string;
+
+}
+
+export interface BuildingInformation{
+    rooms_fullname:string;
+    rooms_shortname: string;
+    rooms_address: string;
+    rooms_lat: number;
+    rooms_lon: number;
+}
+
+export interface RInformation{
+    rooms_seats: number;
+    rooms_type: string;
+    rooms_furniture: string;
+    rooms_href: string;
+    rooms_number:string;
+}
+
+
+
+interface GeoResponse {
+    lat?: number;
+    lon?: number;
+    error?: string;
+}
+
 export default class DatasetController {
 
     private datasets: Datasets = {};
 
     constructor() {
-      
+
         Log.trace('DatasetController::init()');
     }
     /**
@@ -93,15 +135,15 @@ export default class DatasetController {
     public getDatasets(): Datasets {
         // TODO: if datasets is empty, load all dataset files in ./data from disk
 
-         if (Object.keys(this.datasets).length === 0) {  //if datasets does not have any keys, it is empty
-             let fileNames = fs.readdirSync('./data');  //returns an array of file names
-             for (let f of fileNames) {
-                 let data = fs.readFileSync('./data/' + f, 'utf-8');  //returns contents of file
-                 //console.log(data);
-                 let id = f;
-                 this.datasets[id] = JSON.parse(data);
-             }
-         }
+        if (Object.keys(this.datasets).length === 0) {  //if datasets does not have any keys, it is empty
+            let fileNames = fs.readdirSync('./data');  //returns an array of file names
+            for (let f of fileNames) {
+                let data = fs.readFileSync('./data/' + f, 'utf-8');  //returns contents of file
+                //console.log(data);
+                let id = f;
+                this.datasets[id] = JSON.parse(data);
+            }
+        }
 
         return this.datasets;
     }
@@ -119,7 +161,127 @@ export default class DatasetController {
         let that = this;  // inside the function being passed into the new Promise, this object becomes
                           // the function, you could not access to this.datasets or this.getDatasets(),
                           // so assigning that to this allows you to call that.datasets
-        return new Promise(function (fulfill, reject) {
+        if(id=="rooms"){
+
+            return new Promise(function (fulfill, reject) {
+                try {
+                    let myZip = new JSZip();
+                    myZip.loadAsync(data, {base64: true}).then(function (zip: JSZip) {
+                        Log.trace('DatasetController::process(..) - unzipped');
+
+                        // TODO: iterate through files in zip (zip.files)
+                        // The contents of the file will depend on the id provided. e.g.,
+                        // some zips will contain .html files, some will contain .json files.
+                        // You can depend on 'id' to differentiate how the zip should be handled,
+                        // although you should still be tolerant to errors.
+                        let buildings:BuildingInformation[];
+                        if(zip.file("index.htm")== undefined){ reject(true)}else{
+
+                            zip.file("index.htm").async("string").then(function (data:string) {
+                                let pnode = parse5.parse(data);
+
+                                buildings = that.parseBuilding(pnode);
+                                return that.getlatlonarray(buildings);
+
+                            }).then(function(buildingarray:BuildingInformation[] ){
+
+                                let rooms: Datasets ={};
+
+                                let promises:any[] = [];
+                                for(let file in zip.files){
+
+                                    if(zip.file(file)!=null){
+
+                                      promises.push(  zip.file(file).async("string"));
+                                    }
+                                }
+
+
+                                Promise.all(promises).then(function (data:string[]) {
+
+                                    let RoomsMap:Datasets={};
+
+                                    let buildingsMap:Datasets={};
+
+                                    for(let building of buildingarray ){
+
+                                        buildingsMap[building.rooms_shortname] = building;
+
+                                    }
+
+                                    let processedDataArray:RoomInformation[];
+                                    for( let room of data){
+                                        let pnode = parse5.parse(room);
+                                        let roomarray:RInformation[] =  that.parsehtmlRoom(pnode);
+
+                                        for(let a of roomarray ){
+                                            let index = a.rooms_href.lastIndexOf("/");
+                                            let c = a.rooms_href.substring(index+1);
+                                            let d = c.indexOf("-");
+                                            let e = c.substring(0,d);
+                                            if( buildingsMap[e]!= undefined ){
+                                                let building = <BuildingInformation>buildingsMap[e];
+                                                let processedData:RoomInformation ={
+                                                rooms_fullname:building.rooms_fullname,
+                                                rooms_shortname: building.rooms_shortname,
+                                                rooms_number: a.rooms_number,
+                                                rooms_name: building.rooms_shortname+ "_"+ a.rooms_number,
+                                                rooms_address: building.rooms_address,
+                                                rooms_lat: building.rooms_lat,
+                                                rooms_lon: building.rooms_lon,
+                                                rooms_seats: a.rooms_seats,
+                                                rooms_type: a.rooms_type,
+                                                rooms_furniture: a.rooms_furniture,
+                                                rooms_href: a.rooms_href
+
+                                                }
+
+                                                processedDataArray.push(processedData);
+
+                                            }
+
+                                        }
+
+                                        if(that.datasets[id] == undefined){
+                                            that.save(id, processedDataArray);
+                                            fulfill(true);
+                                        }else{
+                                            that.save(id, processedDataArray);
+                                            fulfill(false);
+                                        }
+
+
+                                    }
+
+
+
+                            }
+
+
+
+
+                            )
+
+
+
+                            }).catch(function (err) {
+                                reject(err);
+                            });
+
+                        }
+                    }).catch(function (err) {
+                        Log.trace('DatasetController::process(..) - unzip ERROR: ' + err.message);
+                        reject(err);
+                    });
+                } catch (err) {
+                    Log.trace('DatasetController::process(..) - ERROR: ' + err);
+                    reject(err);
+                }
+            });
+
+
+
+        }else{       return new Promise(function (fulfill, reject) {
             try {
                 let myZip = new JSZip();
                 myZip.loadAsync(data, {base64: true}).then(function (zip: JSZip) {
@@ -132,42 +294,45 @@ export default class DatasetController {
                     // although you should still be tolerant to errors.
 
                     let processedDataset:any = [];
-                  //  let folder: JSZip = zip.folder(id);
+                    //  let folder: JSZip = zip.folder(id);
                     let promises:any[] = [];
                     for(let file in zip.files){
-                       // console.log(file);
+                        // console.log(file);
                         if(zip.file(file)!=null){
                             promises.push(zip.file(file).async("string"));
                         }
                     }
-                    Promise.all(promises).then(function (data:string[]) {
-                         for(let x of data){
-                             //console.log(x);
-                             let a = JSON.parse(x)["result"];
-                             //console.log(a);
-                             if(a == undefined){reject(true)}
-                             for (let i in a) {
+                    Promise.all(promises).then(function (data) {
 
-                                 let b = new ClassInformation();
-                                 b.setCourse_dept(a[i].Subject);
-                                 b.setCourse_id(a[i].Course);
-                                 b.setCourse_avg(a[i].Avg);
-                                 b.setCourse_instructor(a[i].Professor);
-                                 b.setCourse_title(a[i].Title);
-                                 b.setCourse_pass(a[i].Pass);
-                                 b.setCourse_fail(a[i].Fail);
-                                 b.setCourse_audit(a[i].Audit);
-                                 b.setCourse_uuid(<string>a[i].id);
-                                 processedDataset.push(b);
-                             }
-                         }
-                       if(that.datasets[id] == undefined){
-                           that.save(id, processedDataset);
-                           fulfill(true);
-                       }else{
-                           that.save(id, processedDataset);
-                           fulfill(false);
-                       }
+                        for(let x of data){
+                            //console.log(x);
+                            let a = JSON.parse(x)["result"];
+                            //console.log(a);
+                            if(a == undefined){reject(true)}
+                            for (let i in a) {
+
+                                let b = new ClassInformation();
+                                b.setCourse_dept(a[i].Subject);
+                                b.setCourse_id(a[i].Course);
+                                b.setCourse_avg(a[i].Avg);
+                                b.setCourse_instructor(a[i].Professor);
+                                b.setCourse_title(a[i].Title);
+                                b.setCourse_pass(a[i].Pass);
+                                b.setCourse_fail(a[i].Fail);
+                                b.setCourse_audit(a[i].Audit);
+                                b.setCourse_uuid(<string>a[i].id);
+                                processedDataset.push(b);
+                            }
+                        };
+
+
+                        if(that.datasets[id] == undefined){
+                            that.save(id, processedDataset);
+                            fulfill(true);
+                        }else{
+                            that.save(id, processedDataset);
+                            fulfill(false);
+                        }
                     }).catch(function (err) {
                         reject(err);
                     });
@@ -179,7 +344,10 @@ export default class DatasetController {
                 Log.trace('DatasetController::process(..) - ERROR: ' + err);
                 reject(err);
             }
-        });
+        });}
+
+
+
     }
 
     /**
@@ -192,21 +360,171 @@ export default class DatasetController {
     private save(id: string, processedDataset: any) {
         // add it to the memory model
 
-            this.datasets[id] = processedDataset;
-            console.log("Saving processedDataset");
-            // TODO: actually write to disk in the ./data directory
-            // create the './data' folder if it doesn't exist
-            // console.log( fs.lstat('/'+id));
-            let dir = './data/';
-            if (!fs.existsSync(dir)) {
-                fs.mkdirSync(dir);
-            }
-            fs.writeFile('./data/' + id, JSON.stringify(processedDataset));
+        this.datasets[id] = processedDataset;
+        console.log("Saving processedDataset");
+        // TODO: actually write to disk in the ./data directory
+        // create the './data' folder if it doesn't exist
+        // console.log( fs.lstat('/'+id));
+        let dir = './data/';
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir);
+        }
+        fs.writeFile('./data/' + id, JSON.stringify(processedDataset));
 
         // writeFile - asynchronously writes data to a file, replacing the file if it already exists.
     }   // stringify - Converts a JavaScript value to a JavaScript Object Notation (JSON) string.
 
     public deleteDataSets(id:string){
-    this.datasets[id] = undefined;
+        this.datasets[id] = undefined;
     }
+
+    public parseBuilding(pnode:ASTNode ): BuildingInformation[] {
+
+        let buildingArray:any = [];
+        if(pnode.nodeName =="tbody" ){
+            for( let cnode of pnode.childNodes){
+                if(cnode.nodeName=="tr"){
+                    let buildingCode :string;
+                    let title: string;
+                    let buildingAddress: string;
+                    for(let ccnode of cnode.childNodes){
+                        if(ccnode.nodeName=="td" && ccnode.attrs[0].name== "views-field views-field-field-building-code" ){
+                            buildingCode = ccnode.attrs[0].value.trim();
+                        }
+                        if(ccnode.nodeName=="td" && ccnode.attrs[0].name== "views-field views-field-title" ){
+                            for( let cccnode of ccnode.childNodes){
+                                if(cccnode.nodeName== "a"){
+                                    title = cccnode.attrs[0].value.trim();
+                                }
+                            }
+
+                        }
+                        if(ccnode.nodeName=="td" && ccnode.attrs[0].name== "views-field views-field-field-building-address"  ){
+                            buildingAddress = ccnode.attrs[0].value.trim();
+                        }
+
+                    }
+                    let building:BuildingInformation = {
+                        rooms_fullname : title,
+                        rooms_shortname: buildingCode,
+                        rooms_address: buildingAddress,
+                        rooms_lat: 0,
+                        rooms_lon: 0
+                    };
+                    buildingArray.push(building);
+                }
+            }
+
+
+
+
+            return buildingArray;
+        }else{
+
+            for(let child of pnode.childNodes) {
+                let c =  this.parseBuilding(child);
+                if (c !=undefined){
+                    return c;
+                }
+            }
+            return undefined
+        }
+    }
+
+    public parsehtmlRoom(pnode:ASTNode): RInformation[]{
+
+        let RoomArray:any[] = [];
+        if(pnode.nodeName =="tbody" ){
+            for( let cnode of pnode.childNodes){
+                if(cnode.nodeName=="tr"){
+                    let rooms_number: string;
+                    let  rooms_seats: number;
+                    let rooms_type: string;
+                    let rooms_furniture: string;
+                    let rooms_href: string;
+                    for(let ccnode of cnode.childNodes){
+                        if(ccnode.nodeName=="td" && ccnode.attrs[0].name== "views-field views-field-field-room-number" ){
+                            for( let cccnode of ccnode.childNodes){
+                                if(cccnode.nodeName== "a"){
+                                    rooms_href = ccnode.attrs[0].value.trim();
+                                    rooms_number = ccnode.childNodes[0].value;
+                                }
+
+                            }
+                        }
+                        if(ccnode.nodeName=="td" && ccnode.attrs[0].name== "views-field views-field-field-room-capacity" ){
+                            rooms_seats = +ccnode.attrs[0].value.trim();
+                        }
+                        if(ccnode.nodeName=="td" && ccnode.attrs[0].name== "views-field views-field-field-room-furniture" ){
+                            rooms_furniture = ccnode.attrs[0].value.trim().replace("&amp","&");
+                        }
+                        if(ccnode.nodeName=="td" && ccnode.attrs[0].name== "views-field views-field-field-room-type" ){
+                            rooms_type = ccnode.attrs[0].value.trim();
+                        }
+
+
+                    }
+                    let room:RInformation = {
+                        rooms_seats: rooms_seats,
+                        rooms_type:  rooms_type,
+                        rooms_furniture: rooms_furniture,
+                        rooms_href:  rooms_href,
+                        rooms_number:rooms_number
+                    };
+                    RoomArray.push(room);
+                }
+            }
+            return RoomArray;
+        }else{
+
+            for(let child of pnode.childNodes) {
+                let c =  this.parsehtmlRoom(child);
+                if (c !=undefined){
+                    return c;
+                }
+            }
+            return undefined
+        }
+
+    }
+
+
+    public getlatlonarray( buildings:BuildingInformation[] ){
+
+        let new_buildings:any[] = [];
+        for(let building of buildings){
+            new_buildings.push(this.getlatlon(building))
+        }
+        return Promise.all(new_buildings)
+    }
+
+
+    public getlatlon(building: BuildingInformation){
+        return new Promise(function (fulfill, reject) {
+            let query = "http://skaha.cs.ubc.ca:8022/api/v1/team46/"+building.rooms_address.split(" ").join("%20");
+            http.get(query,function (result) {
+                result.setEncoding('utf8');
+                let data = "";
+                result.on("data",(chunk:string)=> data = data + chunk);
+                result.on("end",()=>{
+                    try {
+                        let a: GeoResponse = JSON.parse(data);
+                        if (!a.error){
+                            building.rooms_lat = a.lat;
+                            building.rooms_lon = a.lon;
+                            fulfill(building);
+                        }else{
+                            reject("err");
+                        }
+
+                    }catch(err){
+                        reject(err);
+                    }
+                })
+
+            })
+        })
+
+    }
+
 }
