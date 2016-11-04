@@ -209,39 +209,45 @@ export default class DatasetController {
 
                                     }
 
-                                    let processedDataArray:RoomInformation[];
+                                    let processedDataArray:RoomInformation[] =[];
                                     for( let room of data){
                                         let pnode = parse5.parse(room);
                                         let roomarray:RInformation[] =  that.parsehtmlRoom(pnode);
 
+                                        if(roomarray !=undefined && roomarray.length != 0){
                                         for(let a of roomarray ){
+                                            if(a.rooms_href!= undefined){
                                             let index = a.rooms_href.lastIndexOf("/");
                                             let c = a.rooms_href.substring(index+1);
                                             let d = c.indexOf("-");
                                             let e = c.substring(0,d);
-                                            if( buildingsMap[e]!= undefined ){
+                                            if( buildingsMap[e]!= undefined ) {
                                                 let building = <BuildingInformation>buildingsMap[e];
-                                                let processedData:RoomInformation ={
-                                                rooms_fullname:building.rooms_fullname,
-                                                rooms_shortname: building.rooms_shortname,
-                                                rooms_number: a.rooms_number,
-                                                rooms_name: building.rooms_shortname+ "_"+ a.rooms_number,
-                                                rooms_address: building.rooms_address,
-                                                rooms_lat: building.rooms_lat,
-                                                rooms_lon: building.rooms_lon,
-                                                rooms_seats: a.rooms_seats,
-                                                rooms_type: a.rooms_type,
-                                                rooms_furniture: a.rooms_furniture,
-                                                rooms_href: a.rooms_href
+                                                let processedData: RoomInformation = {
+                                                    rooms_fullname: building.rooms_fullname,
+                                                    rooms_shortname: building.rooms_shortname,
+                                                    rooms_number: a.rooms_number,
+                                                    rooms_name: building.rooms_shortname + "_" + a.rooms_number,
+                                                    rooms_address: building.rooms_address,
+                                                    rooms_lat: building.rooms_lat,
+                                                    rooms_lon: building.rooms_lon,
+                                                    rooms_seats: a.rooms_seats,
+                                                    rooms_type: a.rooms_type,
+                                                    rooms_furniture: a.rooms_furniture,
+                                                    rooms_href: a.rooms_href
 
                                                 }
 
                                                 processedDataArray.push(processedData);
-
+                                            }
                                             }
 
-                                        }
+                                        }}
 
+
+
+
+                                    }
                                         if(that.datasets[id] == undefined){
                                             that.save(id, processedDataArray);
                                             fulfill(true);
@@ -249,9 +255,6 @@ export default class DatasetController {
                                             that.save(id, processedDataArray);
                                             fulfill(false);
                                         }
-
-
-                                    }
 
 
 
@@ -388,19 +391,19 @@ export default class DatasetController {
                     let title: string;
                     let buildingAddress: string;
                     for(let ccnode of cnode.childNodes){
-                        if(ccnode.nodeName=="td" && ccnode.attrs[0].name== "views-field views-field-field-building-code" ){
-                            buildingCode = ccnode.attrs[0].value.trim();
+                        if(ccnode.nodeName=="td" && ccnode.attrs[0].value== "views-field views-field-field-building-code" ){
+                            buildingCode = ccnode.childNodes[0].value.trim();
                         }
-                        if(ccnode.nodeName=="td" && ccnode.attrs[0].name== "views-field views-field-title" ){
+                        if(ccnode.nodeName=="td" && ccnode.attrs[0].value== "views-field views-field-title" ){
                             for( let cccnode of ccnode.childNodes){
                                 if(cccnode.nodeName== "a"){
-                                    title = cccnode.attrs[0].value.trim();
+                                    title = cccnode.childNodes[0].value.trim();
                                 }
                             }
 
                         }
-                        if(ccnode.nodeName=="td" && ccnode.attrs[0].name== "views-field views-field-field-building-address"  ){
-                            buildingAddress = ccnode.attrs[0].value.trim();
+                        if(ccnode.nodeName=="td" && ccnode.attrs[0].value== "views-field views-field-field-building-address"  ){
+                            buildingAddress = ccnode.childNodes[0].value.trim();
                         }
 
                     }
@@ -420,13 +423,14 @@ export default class DatasetController {
 
             return buildingArray;
         }else{
-
-            for(let child of pnode.childNodes) {
-                let c =  this.parseBuilding(child);
-                if (c !=undefined){
-                    return c;
-                }
-            }
+           if(pnode.childNodes!= undefined) {
+               for (let child of pnode.childNodes) {
+                   let c = this.parseBuilding(child);
+                   if (c != undefined) {
+                       return c;
+                   }
+               }
+           }
             return undefined
         }
     }
@@ -443,23 +447,23 @@ export default class DatasetController {
                     let rooms_furniture: string;
                     let rooms_href: string;
                     for(let ccnode of cnode.childNodes){
-                        if(ccnode.nodeName=="td" && ccnode.attrs[0].name== "views-field views-field-field-room-number" ){
+                        if(ccnode.nodeName=="td" && ccnode.attrs[0].value== "views-field views-field-field-room-number" ){
                             for( let cccnode of ccnode.childNodes){
                                 if(cccnode.nodeName== "a"){
-                                    rooms_href = ccnode.attrs[0].value.trim();
-                                    rooms_number = ccnode.childNodes[0].value;
+                                    rooms_href = cccnode.attrs[0].value.trim();
+                                    rooms_number = cccnode.childNodes[0].value;
                                 }
 
                             }
                         }
-                        if(ccnode.nodeName=="td" && ccnode.attrs[0].name== "views-field views-field-field-room-capacity" ){
-                            rooms_seats = +ccnode.attrs[0].value.trim();
+                        if(ccnode.nodeName=="td" && ccnode.attrs[0].value== "views-field views-field-field-room-capacity" ){
+                            rooms_seats = +ccnode.childNodes[0].value.trim();
                         }
-                        if(ccnode.nodeName=="td" && ccnode.attrs[0].name== "views-field views-field-field-room-furniture" ){
-                            rooms_furniture = ccnode.attrs[0].value.trim().replace("&amp","&");
+                        if(ccnode.nodeName=="td" && ccnode.attrs[0].value== "views-field views-field-field-room-furniture" ){
+                            rooms_furniture = ccnode.childNodes[0].value.trim().replace("&amp","&");
                         }
-                        if(ccnode.nodeName=="td" && ccnode.attrs[0].name== "views-field views-field-field-room-type" ){
-                            rooms_type = ccnode.attrs[0].value.trim();
+                        if(ccnode.nodeName=="td" && ccnode.attrs[0].value== "views-field views-field-field-room-type" ){
+                            rooms_type = ccnode.childNodes[0].value.trim();
                         }
 
 
@@ -476,11 +480,13 @@ export default class DatasetController {
             }
             return RoomArray;
         }else{
+            if(pnode.childNodes!=undefined) {
 
-            for(let child of pnode.childNodes) {
-                let c =  this.parsehtmlRoom(child);
-                if (c !=undefined){
-                    return c;
+                for (let child of pnode.childNodes) {
+                    let c = this.parsehtmlRoom(child);
+                    if (c != undefined) {
+                        return c;
+                    }
                 }
             }
             return undefined
