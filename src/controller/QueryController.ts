@@ -2,7 +2,7 @@
  * Created by rtholmes on 2016-06-19.
  */
 
-import {Datasets, ClassInformation} from "./DatasetController";
+import {Datasets, ClassInformation, RoomInformation} from "./DatasetController";
 import Log from "../Util";
 import {App} from "../App";
 
@@ -66,6 +66,7 @@ export interface Responsedata {   //added
     courses_fail?:number;
     courses_audit?:number;
     courses_uuid?:string;
+    courses_year?:number;
     [key: string]:string|number;
 
 }
@@ -86,6 +87,17 @@ export default class QueryController {
 
         if(( query.GROUP != undefined && query.APPLY == undefined)||(query.GROUP == undefined && query.APPLY != undefined)) {
           return false;
+        }
+
+        let a:Map = {};
+        for(let get of query.GET){
+            if(get.indexOf("_")!= -1){
+                let id = get.split("_")[0];
+                a[id] = [];
+                if(Object.keys(a).length> 1){
+                    return false;
+                }
+            }
         }
             if (query.GROUP != undefined && query.APPLY != undefined){
                 //Empty GROUP should not be valid
@@ -173,7 +185,7 @@ export default class QueryController {
          }
 
 
-        let dataset = <Array<ClassInformation>>this.datasets[id]; //get the corresponding dataset
+        let dataset = <Array<any>>this.datasets[id]; //get the corresponding dataset
         let result = new Array<Responsedata>();
 
         try {
@@ -181,16 +193,22 @@ export default class QueryController {
                 if (this.helperFunctionFilter(data, query.WHERE) == true) {
 
                    let respondata: Responsedata = {};
+                   if(respondata.courses_audit) {
 
-                    respondata.courses_avg = data.courses_avg;
-                    respondata.courses_dept = data.courses_dept;
-                    respondata.courses_audit = data.courses_audit;
-                    respondata.courses_fail = data.courses_fail;
-                    respondata.courses_id = data.courses_id;
-                    respondata.courses_instructor = data.courses_instructor;
-                    respondata.courses_title= data.courses_title;
-                    respondata.courses_pass = data.courses_pass;
-                    respondata.courses_uuid = data.courses_uuid;
+                       respondata.courses_avg = data.courses_avg;
+                       respondata.courses_dept = data.courses_dept;
+                       respondata.courses_audit = data.courses_audit;
+                       respondata.courses_fail = data.courses_fail;
+                       respondata.courses_id = data.courses_id;
+                       respondata.courses_instructor = data.courses_instructor;
+                       respondata.courses_title = data.courses_title;
+                       respondata.courses_pass = data.courses_pass;
+                       respondata.courses_uuid = data.courses_uuid;
+                       respondata.courses_year = data.courses_year;
+
+                   }else{
+                       respondata = data;
+                   }
                     result.push(respondata);
                 }
             }
@@ -267,7 +285,7 @@ export default class QueryController {
         //return {status: 'received', ts: new Date().getTime()};
     }
 
-    public helperFunctionFilter(classes:ClassInformation, filter:Filter):boolean{
+    public helperFunctionFilter(classes:ClassInformation|RoomInformation, filter:Filter):boolean{
         if (filter.AND != undefined){
             let result = this.helperFunctionFilter(classes,filter.AND[0]);
             for (let i = 1; i < filter.AND.length; i++){

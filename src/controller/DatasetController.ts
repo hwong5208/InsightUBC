@@ -27,7 +27,8 @@ export class ClassInformation {
     courses_fail:number;
     courses_audit:number;
     courses_uuid:string;
-    [key:string]:any;
+    courses_year:number;
+        [key:string]:any;
 
     constructor(){
         this.courses_dept = null;
@@ -39,7 +40,8 @@ export class ClassInformation {
         this.courses_fail = null;
         this.courses_audit = null;
         this.courses_uuid = null;
-    }
+        this.courses_year = null;
+            }
 
     setCourse_dept(dept:string){this.courses_dept = dept};
     setCourse_id(i:string){this.courses_id = i};
@@ -50,7 +52,7 @@ export class ClassInformation {
     setCourse_fail(f:number){this.courses_fail = f};
     setCourse_audit(a:number){this.courses_audit = a};
     setCourse_uuid(i:string){this.courses_uuid = i};
-
+    setCourse_year(y:number){ this.courses_year = y};
 
 }
 
@@ -66,6 +68,7 @@ export interface RoomInformation{
     rooms_type: string;
     rooms_furniture: string;
     rooms_href: string;
+    [key:string]:string|number;
 
 }
 
@@ -324,6 +327,11 @@ export default class DatasetController {
                                 b.setCourse_fail(a[i].Fail);
                                 b.setCourse_audit(a[i].Audit);
                                 b.setCourse_uuid(<string>a[i].id);
+                                if(a[i].Section == "overall"){ b.setCourse_year(1900)}
+                                else{
+                                    b.setCourse_year(+a[i].Year);
+                                }
+
                                 processedDataset.push(b);
                             }
                         };
