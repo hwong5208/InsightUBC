@@ -180,8 +180,8 @@ export default class DatasetController {
                         let buildings:BuildingInformation[];
                         if(zip.file("index.htm")== undefined){ reject(true)}else{
 
-                            zip.file("index.htm").async("string").then(function (data:string) {
-                                let pnode = parse5.parse(data);
+                            zip.file("index.htm").async("string").then(function (data:string) { //unzip file
+                                let pnode = parse5.parse(data); //tree structure
 
                                 buildings = that.parseBuilding(pnode);
                                 return that.getlatlonarray(buildings);

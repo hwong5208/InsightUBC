@@ -73,6 +73,60 @@ describe("InsightFacade", function () {
 
     });
 
+    it("Should be able to validate a valid query: D2 DOWN MAX", function () {
+
+        let query: QueryRequest = {
+            "GET": ["courses_dept", "courses_id", "courseAverage", "maxFail"],
+            "WHERE": {},
+            "GROUP": [ "courses_dept", "courses_id" ],
+            "APPLY": [ {"courseAverage": {"AVG": "courses_avg"}}, {"maxFail": {"MAX": "courses_fail"}} ],
+            "ORDER": { "dir": "DOWN", "keys": ["courseAverage", "maxFail", "courses_dept", "courses_id"]},
+            "AS":"TABLE"
+        };
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect(response.code).to.equal(200);
+        }).catch(function (response: InsightResponse) {
+            expect.fail();
+        });
+
+    });
+
+    it("Should be able to validate a valid query: D2 UP COUNT", function () {
+
+        let query: QueryRequest = {
+            "GET": ["courses_dept", "courses_id", "numSections"],
+            "WHERE": {},
+            "GROUP": [ "courses_dept", "courses_id" ],
+            "APPLY": [ {"numSections": {"COUNT": "courses_uuid"}} ],
+            "ORDER": { "dir": "UP", "keys": ["numSections", "courses_dept", "courses_id"]},
+            "AS":"TABLE"
+        };
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect(response.code).to.equal(200);
+        }).catch(function (response: InsightResponse) {
+            expect.fail();
+        });
+
+    });
+
+    it("Should be able to validate a valid query: D2 DOWN COUNT NEW", function () {
+
+        let query: QueryRequest = {
+            "GET": ["courses_dept", "courses_id", "numSections"],
+            "WHERE": {},
+            "GROUP": [ "courses_dept", "courses_id" ],
+            "APPLY": [ {"numSections": {"COUNT": "courses_uuid"}} ],
+            "ORDER": { "dir": "DOWN", "keys": ["numSections", "courses_dept", "courses_id"]},
+            "AS":"TABLE"
+        };
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect(response.code).to.equal(200);
+        }).catch(function (response: InsightResponse) {
+            expect.fail();
+        });
+
+    });
+
     it("Should be able to validate a valid query: D1", function () {
 
         let query: QueryRequest =  {
@@ -113,6 +167,33 @@ describe("InsightFacade", function () {
         });
 
     });
+
+    it("Should be able to validate a valid query: D1 NOT", function () {
+
+        let query: QueryRequest =  {
+            "GET": ["courses_dept", "courses_id", "courses_avg"],
+            "WHERE": {
+                "NOT": [
+                    {"AND": [
+                        {"GT": {"courses_avg": 70}},
+                        {"IS": {"courses_dept": "adhe"}}
+                    ]},
+                    {"EQ": {"courses_avg": 90}}
+                ]
+            },
+            "ORDER": "courses_avg",
+            "AS": "TABLE"
+
+        };
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect(response.code).to.equal(200);
+        }).catch(function (response: InsightResponse) {
+            expect.fail();
+        });
+
+    });
+
+
 
     it("Should be able to invalidate an invalid query: D1 Not valid id GT ", function () {
 
@@ -223,6 +304,24 @@ describe("InsightFacade", function () {
 
     });
 
+    it("Should be able to validate a valid query: D2 all keys in ORDER has to be in GET NEW", function () {
+
+        let query: QueryRequest =  {
+            "GET": ["courses_dept", "courses_id", "maxFail"],
+            "WHERE": {},
+            "GROUP": [ "courses_dept", "courses_id" ],
+            "APPLY": [ {"courseAverage": {"AVG": "courses_avg"}}, {"maxFail": {"MAX": "courses_fail"}} ],
+            "ORDER": { "dir": "DOWN", "keys": ["courseAverage", "maxFail", "courses_dept", "courses_id"]},
+            "AS":"TABLE"
+        };
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect.fail();
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(424);
+        });
+
+    });
+
 
     it("Should be able to invalidate an invalid query: D2 GROUP is missing", function () {
 
@@ -232,6 +331,42 @@ describe("InsightFacade", function () {
 
             "APPLY": [ {"courseAverage": {"AVG": "courses_avg"}}, {"maxFail": {"MIN": "courses_fail"}} ],
             "ORDER": { "dir": "DOWN", "keys": ["courseAverage", "maxFail", "courses_dept", "courses_id"]},
+            "AS":"TABLE"
+        };
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect.fail();
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(400);
+        });
+
+    });
+
+    it("Should be able to invalidate an invalid query: D2 APPLY has _ NEW", function () {
+
+        let query: QueryRequest =  {
+            "GET": ["courses_dept", "courses_id", "maxFail"],
+            "WHERE": {},
+            "GROUP": [ "courses_dept", "courses_id" ],
+            "APPLY": [ {"max_Fail": {"MIN": "courses_fail"}} ],
+            "ORDER": { "dir": "DOWN", "keys": ["maxFail", "courses_dept", "courses_id"]},
+            "AS":"TABLE"
+        };
+        return facade.performQuery(query).then(function (response: InsightResponse) {
+            expect.fail();
+        }).catch(function (response: InsightResponse) {
+            expect(response.code).to.equal(400);
+        });
+
+    });
+
+    it("Should be able to invalidate an invalid query: D2 APPLY has _ NEW2", function () {
+
+        let query: QueryRequest =  {
+            "GET": ["courses_dept", "courses_id", "max_Fail"],
+            "WHERE": {},
+            "GROUP": [ "courses_dept", "courses_id" ],
+            "APPLY": [ {"max_Fail": {"MIN": "courses_fail"}} ],
+            "ORDER": { "dir": "DOWN", "keys": ["max_Fail", "courses_dept", "courses_id"]},
             "AS":"TABLE"
         };
         return facade.performQuery(query).then(function (response: InsightResponse) {
