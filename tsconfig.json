@@ -2,6 +2,9 @@
   "compilerOptions": {
     "module": "commonjs",
     "target": "ES5",
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
     "noImplicitAny": true,
     "removeComments": true,
     "preserveConstEnums": true,
