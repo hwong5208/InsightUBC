@@ -26,17 +26,17 @@ import { QueryHelper} from "./CoursesService";
                  <h3>result</h3>
                 
    <p-dataTable [value]="result" sortMode="multiple">
-    <p-column field="courses_dept" header="courses_dept" sortable="true"></p-column>
+     <p-column field="courses_dept" header="courses_dept" sortable="true"></p-column>
      <p-column field="courses_id" header="courses_id" sortable="true"></p-column>
      <p-column field="courses_avg" header="courses_avg" sortable="true"></p-column>
      <p-column field="courses_instructor" header="courses_instructor" sortable="true"></p-column>
      <p-column field="courses_title" header="courses_title" sortable="true"></p-column>
      <p-column field="courses_pass" header="courses_pass" sortable="true"></p-column>
-          <p-column field="courses_fail" header="courses_fail" sortable="true"></p-column>
+     <p-column field="courses_fail" header="courses_fail" sortable="true"></p-column>
      <p-column field="courses_size" header="courses_size" sortable="true"></p-column>
-          <p-column field="courseAverage" header="courseAverage" sortable="true"></p-column>
-           <p-column field="maxFail" header="maxFail" sortable="true"></p-column>
-            <p-column field="maxPass" header="maxPass" sortable="true"></p-column>
+     <p-column field="courseAverage" header="courseAverage" sortable="true"></p-column>
+     <p-column field="maxFail" header="maxFail" sortable="true"></p-column>
+     <p-column field="maxPass" header="maxPass" sortable="true"></p-column>
 </p-dataTable>
  `,
     providers: [QueryHelper]
