@@ -28,6 +28,7 @@ export class ClassInformation {
     courses_audit:number;
     courses_uuid:string;
     courses_year:number;
+    courses_size:number;
         [key:string]:any;
 
     constructor(){
@@ -41,6 +42,7 @@ export class ClassInformation {
         this.courses_audit = null;
         this.courses_uuid = null;
         this.courses_year = null;
+        this.courses_size = null;
             }
 
     setCourse_dept(dept:string){this.courses_dept = dept};
@@ -53,6 +55,7 @@ export class ClassInformation {
     setCourse_audit(a:number){this.courses_audit = a};
     setCourse_uuid(i:string){this.courses_uuid = i};
     setCourse_year(y:number){ this.courses_year = y};
+    setCourse_size(s:number){ this.courses_size = s};
 
 }
 
@@ -327,6 +330,7 @@ export default class DatasetController {
                                 b.setCourse_fail(a[i].Fail);
                                 b.setCourse_audit(a[i].Audit);
                                 b.setCourse_uuid(<string>a[i].id);
+                                b.setCourse_size(a[i].Pass +a[i].Fail);
                                 if(a[i].Section == "overall"){ b.setCourse_year(1900)}
                                 else{
                                     b.setCourse_year(+a[i].Year);
