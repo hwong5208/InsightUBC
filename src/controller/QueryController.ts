@@ -67,6 +67,7 @@ export interface Responsedata {   //added
     courses_audit?:number;
     courses_uuid?:string;
     courses_year?:number;
+    courses_size?:number;
     [key: string]:string|number;
 
 }
@@ -205,6 +206,7 @@ export default class QueryController {
                        respondata.courses_pass = data.courses_pass;
                        respondata.courses_uuid = data.courses_uuid;
                        respondata.courses_year = data.courses_year;
+                       respondata.courses_size = data.courses_size;
 
                    }else{
                        respondata = data;

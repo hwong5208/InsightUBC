@@ -13,9 +13,9 @@ import 'rxjs/Rx';
  * Created by user on 2016/11/12.
  */
 @Injectable()
-export class CoursesService{
+export class QueryHelper{
     constructor (private http: Http) {}
-    public queryCourses(query: QueryRequest):Promise<any>{
+    public query(query: QueryRequest):Promise<any>{
         console.log(query);
 
         let headers = new Headers({ 'Content-Type': 'application/json' });
