@@ -9,9 +9,6 @@ import 'rxjs/Rx';
 
 
 
-/**
- * Created by user on 2016/11/12.
- */
 @Injectable()
 export class QueryHelper{
     constructor (private http: Http) {}
