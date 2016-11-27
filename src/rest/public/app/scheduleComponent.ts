@@ -53,7 +53,7 @@ import { QueryHelper} from "./CoursesService";
     <p-column field="numSection" header="numSection" sortable="true"></p-column>
     <p-column field="maxSize" header="maxSize" sortable="true"></p-column>
    
-    </p-dataTable>,
+    </p-dataTable>
     <button (click)=  schedule()>Schedule</button>
     <p-dataList [value]="schedule_array">
     <template let-room>
