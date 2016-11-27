@@ -13,11 +13,12 @@ import {TabViewModule} from 'primeng/primeng';
 import {RoomsComponent} from "./rooms.component";
 import {scheduleComponent} from "./scheduleComponent";
 import {DataListModule} from 'primeng/primeng';
+import {novelComponent} from "./novelComponent";
 
 
 @NgModule({
   imports:      [ BrowserModule ,  HttpModule, JsonpModule, FormsModule,AccordionModule,DataTableModule,SharedModule,TabViewModule,DataListModule],
-  declarations: [ AppComponent,CoursesComponent, RoomsComponent, scheduleComponent],
+  declarations: [ AppComponent,CoursesComponent, RoomsComponent, scheduleComponent,novelComponent],
   bootstrap:    [ AppComponent ]
 })
 export class AppModule { }

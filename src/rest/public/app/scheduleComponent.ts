@@ -5,7 +5,7 @@
 import { Component } from '@angular/core';
 import {QueryRequest} from "../../../../src/controller/QueryController";
 import {Filter} from "../../../controller/QueryController";
-import { QueryHelper} from "./CoursesService";
+import { QueryHelper} from "./queryHelper";
 
 
 
