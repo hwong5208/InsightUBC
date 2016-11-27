@@ -13,7 +13,7 @@ import { Component } from '@angular/core';
         <rooms></rooms>
     </p-tabPanel>
     <p-tabPanel header="Schedule">
-        Content 3    
+        <schedule></schedule>    
     </p-tabPanel>
 </p-tabView>
 `,
