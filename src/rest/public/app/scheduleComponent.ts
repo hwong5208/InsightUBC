@@ -11,7 +11,8 @@ import { QueryHelper} from "./queryHelper";
 
 @Component({
     selector: 'schedule',
-    template: `<h3>Building</h3>
+    template: `<h4>Select the rooms and courses to schedule</h4>
+                <h3>Building</h3>
                 <input [(ngModel)]="rooms_fullname"><p>{{rooms_fullname}}</p>
                 <h3>Distance </h3>
                  <input type="number"[(ngModel)]="distance"><p>{{distance}}</p>
@@ -20,7 +21,7 @@ import { QueryHelper} from "./queryHelper";
               
                 
                 
-                 <button (click)=  findRooms()>findRooms</button>
+                 <button (click)=  findRooms()>Find Room</button>
               
                  <h3>Result</h3>
                 
@@ -41,7 +42,7 @@ import { QueryHelper} from "./queryHelper";
 <h3>Course id</h3>
 <input [(ngModel)]="courses_id"><p>{{courses_id}}</p>
 
-<button (click)=  findCourse()>findCourse</button>
+<button (click)=  findCourse()>Find Course</button>
 
 <p></p>
 
@@ -67,14 +68,17 @@ import { QueryHelper} from "./queryHelper";
     </template>
     </p-dataList>
     
-    <h3>Unscheduled Courses</h3>
-    <h5>Quality</h5>
-    {{quality}}
+    <h3>Unscheduled courses</h3>
+    
      <ul>
       <li *ngFor="let c of unschedule_array">
         {{ c }}
       </li>
     </ul>
+    
+    <p></p>
+    <h3>Quality of the schedule</h3>
+    {{quality}}
  `,
     providers: [QueryHelper]
 

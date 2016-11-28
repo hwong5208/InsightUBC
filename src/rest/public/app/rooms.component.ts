@@ -25,7 +25,7 @@ import { QueryHelper} from "./queryHelper";
                 <input [(ngModel)]="rooms_type"><p>{{rooms_type}}</p>
                 
                 
-                 <button (click)=  findRooms()>findRooms</button>
+                 <button (click)=  findRooms()>Find Room</button>
               
                  <h3>Result</h3>
                 

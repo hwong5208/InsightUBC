@@ -15,7 +15,7 @@ import { Component } from '@angular/core';
     <p-tabPanel header="Schedule">
         <schedule></schedule>    
     </p-tabPanel>
-     <p-tabPanel header="MinDistance">
+     <p-tabPanel header="Minimum Distance">
         <novel></novel>    
     </p-tabPanel>
 </p-tabView>

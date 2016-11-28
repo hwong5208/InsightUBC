@@ -21,8 +21,8 @@ import { QueryHelper} from "./queryHelper";
                 <input [(ngModel)]="courses_instructor"><p>{{courses_instructor}}</p>
                 <h3>Course title</h3>
                 <input [(ngModel)]="courses_title"><p>{{courses_title}}</p>
-                 <button (click)=  findSection()>findSection</button>
-                 <button (click)=  findCourse()>findCourse</button>
+                 <button (click)=  findSection()>Find Section</button>
+                 <button (click)=  findCourse()>Find Course</button>
                  <h3>Result</h3>
                 
    <p-dataTable [value]="result" sortMode="multiple">

@@ -71,4 +71,4 @@ While these instructions are for WebStorm, other IDEs (e.g., VSCode, Atom, etc.)
 
 To run or test the system in WebStorm you will need to configure run targets. To run the system go to the ```Run->Edit Configurations``` and tap on the ```+``` and then ```Node.js```. Point the 'JavaScript file' argument to ```src/App.js```. To run the system tests, go to the ```Run->Edit Configurations``` and tap on the ```+``` and then ```Mocha```. Point the 'Test Directory' file argument to ```test/```.
 
-
+#### "src/rest/public/app" has been excluded (in tsconfig.json) when submitted for automated testing
