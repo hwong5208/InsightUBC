@@ -1,5 +1,5 @@
 /**
- * Created by user on 2016/11/12.
+ * Created by hwong on 11/20/2016.
  */
 
 import { Component } from '@angular/core';
@@ -23,7 +23,7 @@ import { QueryHelper} from "./queryHelper";
                 <input [(ngModel)]="courses_title"><p>{{courses_title}}</p>
                  <button (click)=  findSection()>findSection</button>
                  <button (click)=  findCourse()>findCourse</button>
-                 <h3>result</h3>
+                 <h3>Result</h3>
                 
    <p-dataTable [value]="result" sortMode="multiple">
      <p-column field="courses_dept" header="courses_dept" sortable="true"></p-column>

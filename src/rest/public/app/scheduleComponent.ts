@@ -22,7 +22,7 @@ import { QueryHelper} from "./queryHelper";
                 
                  <button (click)=  findRooms()>findRooms</button>
               
-                 <h3>result</h3>
+                 <h3>Result</h3>
                 
    <p-dataTable [value]="result" sortMode="multiple" [(selection)]="buildings">
       <p-column selectionMode="multiple"></p-column>
@@ -43,7 +43,7 @@ import { QueryHelper} from "./queryHelper";
 
 <button (click)=  findCourse()>findCourse</button>
 
-
+<p></p>
 
 <p-dataTable [value]="result2" sortMode="multiple"  [(selection)]="courses" >
     <p-column selectionMode="multiple"></p-column>
@@ -54,6 +54,7 @@ import { QueryHelper} from "./queryHelper";
     <p-column field="maxSize" header="maxSize" sortable="true"></p-column>
    
     </p-dataTable>
+    <p></p>
     <button (click)=  schedule()>Schedule</button>
     <p-dataList [value]="schedule_array">
     <template let-room>

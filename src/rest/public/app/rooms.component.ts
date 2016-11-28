@@ -1,5 +1,5 @@
 /**
- * Created by hwong on 11/25/2016.
+ * Created by hwong on 11/20/2016.
  */
 
 import { Component } from '@angular/core';
@@ -13,7 +13,7 @@ import { QueryHelper} from "./queryHelper";
     selector: 'rooms',
     template: `<h3>Building</h3>
                 <input [(ngModel)]="rooms_fullname"><p>{{rooms_fullname}}</p>
-                <h3>Distance </h3>
+                <h3>Distance in meters</h3>
                  <input type="number"[(ngModel)]="distance"><p>{{distance}}</p>
                 <h3>From building</h3>
                 <input [(ngModel)]="building_name"><p>{{building_name}}</p>
@@ -27,7 +27,7 @@ import { QueryHelper} from "./queryHelper";
                 
                  <button (click)=  findRooms()>findRooms</button>
               
-                 <h3>result</h3>
+                 <h3>Result</h3>
                 
    <p-dataTable [value]="result" sortMode="multiple">
     <p-column field="rooms_fullname" header="rooms_fullname" sortable="true"></p-column>
