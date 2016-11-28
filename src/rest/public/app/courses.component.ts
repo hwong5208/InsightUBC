@@ -11,32 +11,34 @@ import { QueryHelper} from "./queryHelper";
 
 @Component({
     selector: 'courses',
-    template: `<h3>Course size</h3>
-                <input type="number"[(ngModel)]="courses_size"><p>{{courses_size}}</p>
-                <h3>Course department</h3>
+    template: `
+               
+                <h3>Course Department</h3>
                 <input [(ngModel)]="courses_dept"><p>{{courses_dept}}</p>
-                <h3>Course id</h3>
+                <h3>Course Number</h3>
                 <input [(ngModel)]="courses_id"><p>{{courses_id}}</p>
-                <h3>Course insturctor</h3>
+                <h3>Course Insturctor</h3>
                 <input [(ngModel)]="courses_instructor"><p>{{courses_instructor}}</p>
-                <h3>Course title</h3>
+                <h3>Course Title</h3>
                 <input [(ngModel)]="courses_title"><p>{{courses_title}}</p>
+                <h3>Course Size</h3>
+                <input type="number"[(ngModel)]="courses_size"><p>{{courses_size}}</p>
                  <button (click)=  findSection()>Find Section</button>
                  <button (click)=  findCourse()>Find Course</button>
                  <h3>Result</h3>
                 
    <p-dataTable [value]="result" sortMode="multiple">
-     <p-column field="courses_dept" header="courses_dept" sortable="true"></p-column>
-     <p-column field="courses_id" header="courses_id" sortable="true"></p-column>
-     <p-column field="courses_avg" header="courses_avg" sortable="true"></p-column>
-     <p-column field="courses_instructor" header="courses_instructor" sortable="true"></p-column>
-     <p-column field="courses_title" header="courses_title" sortable="true"></p-column>
-     <p-column field="courses_pass" header="courses_pass" sortable="true"></p-column>
-     <p-column field="courses_fail" header="courses_fail" sortable="true"></p-column>
-     <p-column field="courses_size" header="courses_size" sortable="true"></p-column>
-     <p-column field="courseAverage" header="courseAverage" sortable="true"></p-column>
-     <p-column field="maxFail" header="maxFail" sortable="true"></p-column>
-     <p-column field="maxPass" header="maxPass" sortable="true"></p-column>
+     <p-column field="courses_dept" header="Course Department" sortable="true"></p-column>
+     <p-column field="courses_id" header="Course Number" sortable="true"></p-column>
+     <p-column field="courses_avg" header="Section Average" sortable="true"></p-column>
+     <p-column field="courses_instructor" header="Instructor" sortable="true"></p-column>
+     <p-column field="courses_title" header="Course Title" sortable="true"></p-column>
+     <p-column field="courses_pass" header="No. of Student Pass" sortable="true"></p-column>
+     <p-column field="courses_fail" header="No. of Student Fail" sortable="true"></p-column>
+     <p-column field="courses_size" header="Course Size" sortable="true"></p-column>
+     <p-column field="courseAverage" header="Course Average" sortable="true"></p-column>
+     <p-column field="maxPass" header="Max no. of Student Pass" sortable="true"></p-column>
+     <p-column field="maxFail" header="Max no. of Student Fail" sortable="true"></p-column>   
 </p-dataTable>
  `,
     providers: [QueryHelper]

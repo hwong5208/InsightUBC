@@ -16,7 +16,7 @@ import { QueryHelper} from "./queryHelper";
                 <input [(ngModel)]="rooms_fullname"><p>{{rooms_fullname}}</p>
                 <h3>Distance </h3>
                  <input type="number"[(ngModel)]="distance"><p>{{distance}}</p>
-                <h3>From building</h3>
+                <h3>From Building</h3>
                 <input [(ngModel)]="building_name"><p>{{building_name}}</p>
               
                 
@@ -27,19 +27,19 @@ import { QueryHelper} from "./queryHelper";
                 
    <p-dataTable [value]="result" sortMode="multiple" [(selection)]="buildings">
       <p-column selectionMode="multiple"></p-column>
-    <p-column field="rooms_fullname" header="rooms_fullname" sortable="true"></p-column>
-     <p-column field="rooms_shortname" header="rooms_shortname" sortable="true"></p-column>
-     <p-column field="rooms_number" header="rooms_number" sortable="true"></p-column>
-     <p-column field="rooms_address" header="rooms_address" sortable="true"></p-column>
-     <p-column field="rooms_seats" header="rooms_seats" sortable="true"></p-column>
-     <p-column field="rooms_type" header="rooms_type" sortable="true"></p-column>
-          <p-column field="rooms_furniture" header="rooms_furniture" sortable="true"></p-column>
+    <p-column field="rooms_fullname" header="Building (Full name)" sortable="true"></p-column>
+     <p-column field="rooms_shortname" header="Building (Short name)" sortable="true"></p-column>
+     <p-column field="rooms_number" header="Room Number" sortable="true"></p-column>
+     <p-column field="rooms_address" header="Address" sortable="true"></p-column>
+     <p-column field="rooms_seats" header="Seats" sortable="true"></p-column>
+     <p-column field="rooms_type" header="Type" sortable="true"></p-column>
+          <p-column field="rooms_furniture" header="Furniture" sortable="true"></p-column>
           
 </p-dataTable>
 
-<h3>Course department</h3>
+<h3>Course Department</h3>
 <input [(ngModel)]="courses_dept"><p>{{courses_dept}}</p>
-<h3>Course id</h3>
+<h3>Course Number</h3>
 <input [(ngModel)]="courses_id"><p>{{courses_id}}</p>
 
 <button (click)=  findCourse()>Find Course</button>
@@ -48,10 +48,10 @@ import { QueryHelper} from "./queryHelper";
 
 <p-dataTable [value]="result2" sortMode="multiple"  [(selection)]="courses" >
     <p-column selectionMode="multiple"></p-column>
-    <p-column field="courses_dept" header="courses_dept" sortable="true"></p-column>
-    <p-column field="courses_id" header="courses_id" sortable="true"></p-column>
+    <p-column field="courses_dept" header="Course Department" sortable="true"></p-column>
+    <p-column field="courses_id" header="Course Number" sortable="true"></p-column>
 
-    <p-column field="numSection" header="numSection" sortable="true"></p-column>
+    <p-column field="numSection" header="Number of Section" sortable="true"></p-column>
     <p-column field="maxSize" header="maxSize" sortable="true"></p-column>
    
     </p-dataTable>
@@ -68,7 +68,7 @@ import { QueryHelper} from "./queryHelper";
     </template>
     </p-dataList>
     
-    <h3>Unscheduled courses</h3>
+    <h3>Unscheduled Courses</h3>
     
      <ul>
       <li *ngFor="let c of unschedule_array">
@@ -77,7 +77,7 @@ import { QueryHelper} from "./queryHelper";
     </ul>
     
     <p></p>
-    <h3>Quality of the schedule</h3>
+    <h3>Quality of the Schedule</h3>
     {{quality}}
  `,
     providers: [QueryHelper]

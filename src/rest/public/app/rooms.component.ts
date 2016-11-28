@@ -15,14 +15,15 @@ import { QueryHelper} from "./queryHelper";
                 <input [(ngModel)]="rooms_fullname"><p>{{rooms_fullname}}</p>
                 <h3>Distance in meters</h3>
                  <input type="number"[(ngModel)]="distance"><p>{{distance}}</p>
-                <h3>From building</h3>
+                <h3>From Building</h3>
                 <input [(ngModel)]="building_name"><p>{{building_name}}</p>
                 <h3>Size</h3>
                 <input [(ngModel)]="size"><p>{{size}}</p>
-                <h3>Furniture</h3>
-                <input [(ngModel)]="rooms_furniture"><p>{{rooms_furniture}}</p>
                 <h3>Type</h3>
                 <input [(ngModel)]="rooms_type"><p>{{rooms_type}}</p>
+                <h3>Furniture</h3>
+                <input [(ngModel)]="rooms_furniture"><p>{{rooms_furniture}}</p>
+                
                 
                 
                  <button (click)=  findRooms()>Find Room</button>
@@ -30,13 +31,13 @@ import { QueryHelper} from "./queryHelper";
                  <h3>Result</h3>
                 
    <p-dataTable [value]="result" sortMode="multiple">
-    <p-column field="rooms_fullname" header="rooms_fullname" sortable="true"></p-column>
-     <p-column field="rooms_shortname" header="rooms_shortname" sortable="true"></p-column>
-     <p-column field="rooms_number" header="rooms_number" sortable="true"></p-column>
-     <p-column field="rooms_address" header="rooms_address" sortable="true"></p-column>
-     <p-column field="rooms_seats" header="rooms_seats" sortable="true"></p-column>
-     <p-column field="rooms_type" header="rooms_type" sortable="true"></p-column>
-          <p-column field="rooms_furniture" header="rooms_furniture" sortable="true"></p-column>
+    <p-column field="rooms_fullname" header="Building (Full name)" sortable="true"></p-column>
+     <p-column field="rooms_shortname" header="Building (Short name)" sortable="true"></p-column>
+     <p-column field="rooms_number" header="Room Number" sortable="true"></p-column>
+     <p-column field="rooms_address" header="Address" sortable="true"></p-column>
+     <p-column field="rooms_seats" header="Seats" sortable="true"></p-column>
+     <p-column field="rooms_type" header="Type" sortable="true"></p-column>
+          <p-column field="rooms_furniture" header="Furniture" sortable="true"></p-column>
    
 </p-dataTable>
  `,
