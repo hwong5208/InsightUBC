@@ -3,7 +3,7 @@
  */
 
 import { Component } from '@angular/core';
-import {QueryRequest} from "../../../../src/controller/QueryController";
+import {QueryRequest, Responsedata} from "../../../../src/controller/QueryController";
 import {Filter} from "../../../controller/QueryController";
 import { QueryHelper} from "./queryHelper";
 
@@ -95,7 +95,18 @@ export class CoursesComponent{
         let query:QueryRequest = {GET: get,WHERE:where,AS:as};
         let that = this;
         this.queryHelper.query(query).then(function(res){
-            that.result = res;
+
+            let res2 :Array<Responsedata> = [];
+            if(that.courses_size!= undefined) {
+                for (let r of res) {
+                    if (r.courses_size < that.courses_size) {
+                       res2.push(r);
+                    }
+                }
+                that.result = res2;
+            }else{that.result = res;}
+
+
         }).catch(function(err){
             console.log("fail");
         });
