@@ -90,6 +90,9 @@ export class RoomsComponent{
                 where.AND.push({GT: {"rooms_seats": this.size}})
             }
 
+            if (this.rooms_furniture != "" && this.rooms_furniture != "" ) {
+                where.OR.push( [{IS: {"rooms_furniture": this.rooms_furniture}},{IS: {"rooms_type": this.rooms_type}} ])
+            }
             if (this.rooms_furniture != "") {
                 where.AND.push({IS: {"rooms_furniture": this.rooms_furniture}})
             }
@@ -102,8 +105,13 @@ export class RoomsComponent{
         let query:QueryRequest = {GET: get,WHERE:where,AS:as};
         let that = this;
         this.queryHelper.query(query).then(function(res){
+
+            if(res.length == 0  ){
+                alert("Not found")
+            }
             if(that.distance== undefined || that.building_name=="" ){
-                that.result = res;
+
+                    that.result = res;
 
             }else {
                 let get:string[] = [
@@ -112,6 +120,8 @@ export class RoomsComponent{
                     ];
                 let query:QueryRequest = {GET: get,WHERE:{IS:{"rooms_shortname":that.building_name}},AS:as};
                 that.queryHelper.query(query).then(function(geo) {
+
+
                     that.result=[];
                     for( let a of res){
                      if(that.getDistanceFromLatLonInKm(geo[0].rooms_lat,geo[0].rooms_lon,a.rooms_lat,a.rooms_lon)<= that.distance){
@@ -119,8 +129,6 @@ export class RoomsComponent{
                      }
 
                     }
-
-
 
 
 

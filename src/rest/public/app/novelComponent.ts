@@ -12,7 +12,7 @@ import { QueryHelper} from "./queryHelper";
     template: `<h4>You can:</h4>
                <h4>- estimate the time needed to walk from one building to another</h4>
                <h4>- estimate the time needed to walk from one building to another based on your speed</h4>
-               <h4>- estimate the speed needed to walk from one building to another within an estimated time</h4>
+               <h4>- estimate the speed needed to walk from one building to another within an expected time</h4>
                <p></p>
                <p></p> 
                 <h3>To building</h3>
@@ -22,7 +22,7 @@ import { QueryHelper} from "./queryHelper";
                 <input [(ngModel)]="building_name"><p>{{building_name}}</p>
                 
                 <h3>Speed in m/s</h3>
-                <input [(ngModel)]="speed"><p>{{speed}}</p>
+                <input type="number" [(ngModel)]="speed"><p>{{speed}}</p>
                 
                 <h3>Expected time in minutes</h3>
                 <input type="number" [(ngModel)]="expectedTime"><p>{{expectedTime}}</p>
@@ -88,6 +88,8 @@ let that = this
         let that = this;
         Promise.all(promises).then(function (res:{rooms_lat:number,rooms_lon:number}[]) {
          that.distance = +(that.getDistanceFromLatLonInM(res[0].rooms_lat, res[0].rooms_lon,res[1].rooms_lat,res[1].rooms_lon)).toFixed(2)
+
+
          that.time = +(that.distance/that.speed/60).toFixed(2);
          if(that.expectedTime != undefined){
              that.expectedSpeed = +(that.distance/that.expectedTime/60).toFixed(2);

@@ -103,8 +103,16 @@ export class CoursesComponent{
                        res2.push(r);
                     }
                 }
+                if(res.length == 0  ){
+                    alert("Not found")
+                }
                 that.result = res2;
-            }else{that.result = res;}
+            }else{
+                if(res.length == 0  ){
+                    alert("Not found")
+                }
+
+                that.result = res;}
 
 
         }).catch(function(err){
@@ -133,6 +141,9 @@ export class CoursesComponent{
         let query:QueryRequest = {GET: get,WHERE:where,GROUP:group,APPLY:apply,AS:as};
         let that = this;
         this.queryHelper.query(query).then(function(res){
+            if(res.length == 0  ){
+                alert("Not found")
+            }
             that.result = res;
         }).catch(function(err){
             console.log("fail");

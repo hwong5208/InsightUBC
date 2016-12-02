@@ -52,7 +52,7 @@ import { QueryHelper} from "./queryHelper";
     <p-column field="courses_id" header="Course Number" sortable="true"></p-column>
 
     <p-column field="numSection" header="Number of Section" sortable="true"></p-column>
-    <p-column field="maxSize" header="maxSize" sortable="true"></p-column>
+    <p-column field="maxSize" header="Size" sortable="true"></p-column>
    
     </p-dataTable>
     <p></p>
