@@ -1,10 +1,11 @@
-Hi this is my CPSC310 assigment.
+CPSC310 assigment: InsightUBC                                                                                                           Sep 2016
 
+Objectives:
+1. Full stack web development
 
-InsightUBC                                                                                                           Sep 2016
+2. Built a database server that can process input zip file data, cache processed data onto disk, and answer  queries similar to standard SQL query
 
-Full stack web development 
-Built a database server that can process input zip file data, cache processed data onto disk, and answer  queries similar to standard SQL query
-Built a user-friendly website which can take user input, convert it to legal query format and exchange data with the backend server through restful API
+3. Built a user-friendly website which can take user input, convert it to legal query format and exchange data with the backend server through restful API
 
-Technologies and used tools:  Typescript, Node, and Angular2
+Technologies / Tools used:  
+Typescript, Node, and Angular2
