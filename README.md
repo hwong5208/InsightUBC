@@ -1,4 +1,4 @@
-Hi this is my CPSC310 assigment: InsightUBC                                                                                                           Sep 2016
+CPSC310 assigment: InsightUBC                                                                                                           Sep 2016
 
 Objectives:
 1. Full stack web development
